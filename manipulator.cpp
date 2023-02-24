@@ -2,14 +2,17 @@
 #define MANIPULATOR_CPP
 
 #include "manipulator.h"
-Manipulator::Manipulator(bool launch, bool test){
-    if (m_pca.begin() == false) {
-        SerialUSB.println("PCA9536 not detected or failed to init! Check the I2C connection and reset the ROV");
+#include "SparkFun_PCA9536_Arduino_Library.h"
+#include "USB/USBAPI.h"
+#include "Wire.h"
+#include "logger.h"
+Manipulator::Manipulator(bool launch, bool test) : m_pca(new PCA9536){
+    if (m_pca->begin(Wire) == false) {
+        Logger::error(F("PCA9536 not detected or failed to init! Check the I2C connection and reset the ROV"));
     }
-
     for (int i = 0; i < 4; i++) {
-        m_pca.pinMode(i, OUTPUT);
-        m_pca.write(i, LOW);
+        m_pca->pinMode(i, OUTPUT);
+        m_pca->write(i, LOW);
     }
 }
 
@@ -47,6 +50,6 @@ inline void Manipulator::writePCA(int ch, int power){
     if (abs(power) >= 50) {
         state = HIGH;
     }
-    m_pca.write(ch, state);
+    m_pca->write(ch, state);
 }
 #endif

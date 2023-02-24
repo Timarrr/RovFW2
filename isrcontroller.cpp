@@ -1,10 +1,15 @@
 #ifndef ISRCONTROLLER_CPP
 #define ISRCONTROLLER_CPP
 #include "isrcontroller.h"
-#include "config.h"
+#include "logger.h"
+#define ISR_SERVO_DEBUG 2
 
-ISRController::ISRController(const int pins[8]){
+
+ISRController::ISRController(){
     using namespace config::thrusters;
+
+    Logger::debug(F("ISR init"));
+
     SAMD_ISR_Servos.useTimer(TIMER_TCC);
 
     m_pins[thrusters::horizontal_front_left]  = pins[0];
@@ -15,18 +20,22 @@ ISRController::ISRController(const int pins[8]){
     m_pins[thrusters::vertical_front_right]   = pins[5];
     m_pins[thrusters::vertical_back_left]     = pins[6];
     m_pins[thrusters::vertical_back_right]    = pins[7];
-    // m_pins[thrusters::custom_0]               = pins[8];
-    // m_pins[thrusters::custom_1]               = pins[9];
 
+    Logger::trace(F("setupServo()"));
     for (int i = 0; i < 8; i++) {
+        Logger::trace(String(i));
         m_isrServos[i] = SAMD_ISR_Servos.setupServo(m_pins[i], pulse_min, pulse_max);
     }
 
+    Logger::trace("Thrusters setReadyToRun()");
     SAMD_ISR_Servos.setReadyToRun();
 
+    Logger::trace(F("setPulseWidth()"));
     for (int i = 0; i < 8; i++) {
+        Logger::trace(String(i));
         SAMD_ISR_Servos.setPulseWidth(m_isrServos[i], pulse_med);
     }
+    Logger::debug(F("Done"));
 }
 
 void ISRController::setThruster(int idx, int power) {

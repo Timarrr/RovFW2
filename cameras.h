@@ -4,6 +4,8 @@
 #include <Arduino.h>
 #include <Servo.h>
 #include "config.h"
+#include "logger.h"
+
 
 class Cameras{
 public:

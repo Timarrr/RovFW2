@@ -7,6 +7,7 @@
 #include "networking.h"
 #include "rovdatatypes.h"
 #include "sensors.h"
+#include "imu.h"
 #include "thrusters.h"
 #include "isrcontroller.h"
 #include "cameras.h"
@@ -24,6 +25,7 @@ class Rov{
         Manipulator *manipulator;
         Networking *networking;
         Sensors *sensors;
+        IMUSensor *imu;
         ISRController *isr;
         RovTelemetry *tele;
         RovControl *control;

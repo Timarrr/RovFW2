@@ -112,8 +112,9 @@ int SAMD_ISR_Servo::setupServo(uint8_t pin, int min, int max)
   if (pin > SAMD_MAX_PIN)
     return -1;
 
-  if (numServos < 0)
+  if (numServos < 0){
     init();
+  }
 
   servoIndex = findFirstFreeSlot();
 

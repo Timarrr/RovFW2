@@ -19,7 +19,7 @@ public:
     inline void set(int ch1, int ch2, int power);
 
 private:
-    PCA9536 m_pca;
+    PCA9536 *m_pca;
 };
 
 #endif

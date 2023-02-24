@@ -1,48 +1,51 @@
 #ifndef NETWORKING_CPP
 #define NETWORKING_CPP
 #include "networking.h"
+#include "USB/USBAPI.h"
+#include "logger.h"
 #include "utility/w5100.h"
 #include "helpers.h"
 #include "rovdatatypes.h"
 #include <cstddef>
+#include <cstdio>
 
 Networking::Networking(bool launch, bool test){
     if (!launch) return;
     Ethernet.init(m_csPin);
 	if (Ethernet.hardwareStatus() == EthernetNoHardware) {
-	  SerialUSB.println("Ethernet controller was not found. If the next message is \"Ethernet init... Success!\" then you can ignore this message");
-      SerialUSB.println(W5100.getChip());
+	  Logger::warn(F("Ethernet controller was not found. If the next message is \"Ethernet init... Success!\" then you can ignore this message\n\r"));
+      Logger::warn("Chip ID: " + String(W5100.getChip()));
 	}
 	else if (Ethernet.hardwareStatus() == EthernetW5100) {
-	  SerialUSB.println("W5100 Ethernet controller detected.");
+	  Logger::warn(F("W5100 Ethernet controller detected.\n\r"));
 	}
 	else if (Ethernet.hardwareStatus() == EthernetW5200) {
-	  SerialUSB.println("W5200 Ethernet controller detected.");
+	  Logger::warn(F("W5200 Ethernet controller detected.\n\r"));
 	}
 	else if (Ethernet.hardwareStatus() == EthernetW5500) {
-	  SerialUSB.println("W5500 Ethernet controller detected.");
+	  Logger::warn(F("W5500 Ethernet controller detected.\n\r"));
 	}
-	SerialUSB.print("Ethernet init... ");
-	SerialUSB.println(Ethernet.begin(mac, 10000, 5000)==1 ? "Success!" : "Failed!");
+	Logger::info(F("Ethernet init... "));
+	Logger::info(F(Ethernet.begin(mac, 10000, 5000)==1 ? "Success!\n\r" : "Failed!\n\r"));
 	m_udp.begin(m_selfPort);
 }
 
-String Networking::printStatus(){
-    SerialUSB.print("Target self IP:     "); SerialUSB.println(m_selfIp);
-	SerialUSB.print("Current self IP:    "); SerialUSB.println(Ethernet.localIP());
-	SerialUSB.print("DNS server IP:      "); SerialUSB.println(Ethernet.dnsServerIP());
-	SerialUSB.print("Gateway IP:         "); SerialUSB.println(Ethernet.gatewayIP());
-	SerialUSB.print("Subnet mask:        "); SerialUSB.println(Ethernet.subnetMask());
-	SerialUSB.print("Link status:        "); SerialUSB.println((Ethernet.linkStatus() ? "ON" : "OFF"));
+String Networking::getStatus(){
+    return "Target self IP:      " + String(m_selfIp) +
+	   "\n\rCurrent self IP: " + String(Ethernet.localIP()) +
+	   "\n\rDNS server IP:       " + String(Ethernet.dnsServerIP()) +
+	   "\n\rGateway IP:          " + String(Ethernet.gatewayIP()) +
+	   "\n\rSubnet mask:         " + String(Ethernet.subnetMask()) +
+	   "\n\rLink status:         " + String((Ethernet.linkStatus() ? "ON" : "OFF"));
 }
 
 void Networking::maintain(){
 	if (Ethernet.linkStatus() == LinkON && !m_linkUp) {
-		SerialUSB.println("Link status: On");
+		Logger::info(F("Link status: On"));
 		m_linkUp = true;
 	}
 	else if (Ethernet.linkStatus() == LinkOFF && m_linkUp) {
-		SerialUSB.println("Link status: Off. This usually indicates problems with cable");
+		Logger::info(F("Link status: Off. This usually indicates problems with cable"));
 		m_linkUp = false;
 	}
 	if ((m_linkUp && (millis() >= m_lastMaintainTime + 500)) || millis() >= m_lastMaintainTime + 5000){//if link is up -> check every half a second, otherwise check once every 5 seconds
@@ -51,23 +54,22 @@ void Networking::maintain(){
 			case 0:
 				break;
 			case 1:
-				SerialUSB.println("DHCP lease renew failed, check the configuration of your DHCP server");
+				Logger::warn(F("DHCP lease renew failed, check the configuration of your DHCP server"));
 				break;
 			case 2:
-				SerialUSB.println("DHCP lease renew success");
+				Logger::info(F("DHCP lease renew success"));
 				break;
 			case 3:
-				SerialUSB.println("DHCP rebind failed, check the configuration of your DHCP server");
+				Logger::warn(F("DHCP rebind failed, check the configuration of your DHCP server"));
 				break;
 			case 4:
 				if(m_linkUp)
 				{
-					SerialUSB.println("DHCP rebind detected, this almost certainly will break things");
+					Logger::warn(F("DHCP rebind detected, this almost certainly will break things"));
 				}
 				else
 				{
-					String ip = (String) Ethernet.localIP();
-					SerialUSB.println("Binding to DHCP address " + ip + " after downtime, check the IP and reboot the router and the ROV if it is incorrect\n\r" + \
+					Logger::warn("Binding to DHCP address " + (String) Ethernet.localIP() + " after downtime, check the IP and reboot the router and/or the ROV if it is incorrect.\n\r" + \
 										 "If problem persists, check your router and PC's settings");
 				}
 				break;

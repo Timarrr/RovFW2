@@ -2,10 +2,11 @@
 #define CAMERAS_CPP
 
 #include "cameras.h"
-#include "config.h"
 
-Cameras::Cameras(bool launch, bool test) : m_camServos(){
-    SerialUSB.println("Rotary cameras init");
+Cameras::Cameras(bool launch, bool test){
+    Logger::info(F("Rotary cameras init"));
+    m_camServos[0] = Servo();
+    m_camServos[1] = Servo();
     m_camServos[0].attach(config::cameras::servos::front);
     m_camServos[1].attach(config::cameras::servos::back);
     m_camServos[0].writeMicroseconds(angles[0]);

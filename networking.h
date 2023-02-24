@@ -14,7 +14,7 @@ public:
     void init();
     void readRovControl(RovControl &ctrl);
     void writeRovTelemetry(RovTelemetry &tel);
-    String printStatus();
+    String getStatus();
 private:
     int read(uint8_t *buffer, int size);
     void write(uint8_t *buffer, int size);

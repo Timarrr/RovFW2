@@ -203,6 +203,7 @@ class SAMD_ISR_Servo
 
     void init()
     {
+      
       SAMD_ITimer = new SAMDFastTimer(_timerNo);
 
       for (int servoIndex = 0; servoIndex < MAX_ISR_SERVOS; servoIndex++)

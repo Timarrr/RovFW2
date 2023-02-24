@@ -31,11 +31,11 @@
 //////////////////////////////////////////
 
 #ifndef TIMER_INTERRUPT_DEBUG
-  #define TIMER_INTERRUPT_DEBUG         0
+  #define TIMER_INTERRUPT_DEBUG         127
 #endif
 
 #ifndef ISR_SERVO_DEBUG
-  #define ISR_SERVO_DEBUG               0
+  #define ISR_SERVO_DEBUG               127
 #endif
 
 //////////////////////////////////////////
