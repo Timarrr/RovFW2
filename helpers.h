@@ -4,13 +4,13 @@
 #include <Arduino.h>
 namespace helpers {
     template<typename T>
-    inline void read_bytes(const uint8_t *msg, size_t &i, T &data){
+    void read_bytes(const uint8_t *msg, size_t &i, T &data){
         memcpy(&data, msg + i, sizeof(data));
         i += sizeof(data);
     }
 
     template<typename T>
-    inline void write_bytes(uint8_t *msg, size_t &i, T &data){
+    void write_bytes(uint8_t *msg, size_t &i, T &data){
         memcpy(msg + i, &data, sizeof(data));
         i += sizeof(data);
     }

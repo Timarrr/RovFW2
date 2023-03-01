@@ -9,9 +9,11 @@ Uart SerialImu (&sercom1, 12, 11, SERCOM_RX_PAD_3, UART_TX_PAD_0);
 
 IMUSensor::IMUSensor(bool launch, bool test){
     Logger::info(F("IMU init"));
-    SerialImu.begin(115200);
     pinPeripheral(11, PIO_SERCOM);
+    Logger::info(F("SetP12"));
     pinPeripheral(12, PIO_SERCOM);
+    Logger::info(F("ISBegin"));
+    SerialImu.begin(115200);
 }
 
 void IMUSensor::imuCrc16Update(uint16_t *currentCrc, const uint8_t *src, uint32_t lengthInBytes)

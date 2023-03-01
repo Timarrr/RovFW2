@@ -2,6 +2,7 @@
 #define SENSORS_CPP
 #include "sensors.h"
 #include "USB/USBAPI.h"
+#include "config.h"
 #include "logger.h"
 
 
@@ -9,12 +10,11 @@ Sensors::Sensors(bool launch, bool test, bool ds_init){
     if(!ds_init) return;
 
     Logger::info(F("Depth sensor init"));
-    bool ok = m_depthSensor.init();
-    if (!ok) {
+    if (!m_depthSensor.init()) {
         Logger::warn(F("Depth sensor init failed! Will retry init on next read"));
         return;
     }
-
+    m_depthSensorEnabled = true;
     m_depthSensor.setModel(MS5837::MS5837_30BA);
     m_depthSensor.setFluidDensity(997); // kg/m^3 (997 for freshwater, 1029 for seawater)
 }
@@ -22,11 +22,9 @@ Sensors::Sensors(bool launch, bool test, bool ds_init){
 void Sensors::update() {
     using namespace config::sensors;
 
-    Logger::info(F("rAS"));
     int rawVoltage = analogRead(voltmeter_pin);
     int rawAmperage = analogRead(ammeter_pin);
 
-    Logger::info(F("pASI"));
     float curVoltage = round(rawVoltage * (voltage_multiplier * 100.0)) / 100.0;
     float curAmperage = round((rawAmperage - amperage_deflection) * (amperage_multiplier * 100.0)) / 100.0;
 
@@ -35,20 +33,15 @@ void Sensors::update() {
     m_current += curAmperage;
     m_current /= 2;
 
-    bool status = false; // false = error, true = ok
-
-
-    if ((millis() - m_lastDepthUpdateMs) > 200) {
+    if (m_depthSensorEnabled && (millis() - m_lastDepthUpdateMs) > 200) {
         m_depthSensor.read();
         m_lastDepthUpdateMs = millis();
 
         if (abs(m_depthSensor.depth()) < 150) {
-            status = true;
             m_depth = m_depthSensor.depth();
             m_temp = m_depthSensor.temperature();
         } else { // don't accept value if value is too big (probably corrupted data)
             Logger::warn(F("Depth sensor read error. Retrying init"));
-            status = false;
 
             // trying to reset I2C and init sensor again.
             Wire.end();

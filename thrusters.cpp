@@ -7,7 +7,7 @@
 #include "config.h"
 #include "isrcontroller.h"
 #include "logger.h"
-#define THRUSTER_TEST_WAIT_TIME 500
+#define THRUSTER_TEST_WAIT_TIME 250
 
 Thrusters::Thrusters(bool launch, bool test){
     if (!launch){
@@ -15,7 +15,7 @@ Thrusters::Thrusters(bool launch, bool test){
         return;
     }
     Logger::info(F("Waiting for thrusters init..."));
-    delay(6000);
+    delay(8000);
     Logger::info(F("  Done!"));
     if (test)
         this->test();
@@ -51,13 +51,13 @@ void Thrusters::update_thrusters(RovControl &ctrl) {
 	m_controller.setThruster(thrusters::vertical_back_left,     ctrl.thrusterPower[6]);
 	m_controller.setThruster(thrusters::vertical_back_right,    ctrl.thrusterPower[7]);
 	
-	Logger::info(
+/*	Logger::info(
 		"0-HFL:	" + (String) ctrl.thrusterPower[0] + "	1-HFR:	" + (String) ctrl.thrusterPower[1] + "\n\r"
 		"2-HRL:	" + (String) ctrl.thrusterPower[2] + "	3-HRR:	" + (String) ctrl.thrusterPower[3] + "\n\r"
 		"4-VFL:	" + (String) ctrl.thrusterPower[4] + "	5-VFR:	" + (String) ctrl.thrusterPower[5] + "\n\r"
 		"6-VRL:	" + (String) ctrl.thrusterPower[6] + "	7-VRR:	" + (String) ctrl.thrusterPower[7] + "\n\r"
 	);
-
+*/
 }
 
 #endif

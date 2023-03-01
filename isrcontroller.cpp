@@ -21,21 +21,13 @@ ISRController::ISRController(){
     m_pins[thrusters::vertical_back_left]     = pins[6];
     m_pins[thrusters::vertical_back_right]    = pins[7];
 
-    Logger::trace(F("setupServo()"));
     for (int i = 0; i < 8; i++) {
-        Logger::trace(String(i));
         m_isrServos[i] = SAMD_ISR_Servos.setupServo(m_pins[i], pulse_min, pulse_max);
     }
-
-    Logger::trace("Thrusters setReadyToRun()");
     SAMD_ISR_Servos.setReadyToRun();
-
-    Logger::trace(F("setPulseWidth()"));
     for (int i = 0; i < 8; i++) {
-        Logger::trace(String(i));
         SAMD_ISR_Servos.setPulseWidth(m_isrServos[i], pulse_med);
     }
-    Logger::debug(F("Done"));
 }
 
 void ISRController::setThruster(int idx, int power) {

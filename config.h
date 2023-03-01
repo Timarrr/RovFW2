@@ -5,7 +5,7 @@
 namespace config {
     namespace net {
         constexpr uint8_t rovIP[4] = {192, 168, 1, 5};
-        constexpr uint16_t rovPort = 3020;
+        constexpr uint16_t rovPort = 3010;
         constexpr uint8_t rcIP[4] = {192, 168, 1, 4};
         constexpr uint16_t rcPort = 3010;
         constexpr uint8_t netControllerCsPin = 43; // W5500 CS on PA13 pin
@@ -35,7 +35,7 @@ namespace config {
         };
     }
     namespace thrusters {
-        constexpr int pins[10] = {2,3,4,5,6,7,8,9};//10,11};
+        constexpr int pins[10] = {3,9,8,7,2,6,4,5};//10,11};
         enum thrusters {
             horizontal_front_left = 0,
             horizontal_front_right,

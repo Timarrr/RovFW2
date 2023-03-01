@@ -34,6 +34,7 @@ private:
     float m_depth = 0.0;
     float m_temp = 0.0;
     long long m_lastDepthUpdateMs = 0;
+    bool m_depthSensorEnabled = false;
 };
 
 #endif

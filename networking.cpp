@@ -1,36 +1,32 @@
 #ifndef NETWORKING_CPP
 #define NETWORKING_CPP
 #include "networking.h"
-#include "USB/USBAPI.h"
+#include "Ethernet.h"
 #include "logger.h"
-#include "utility/w5100.h"
-#include "helpers.h"
-#include "rovdatatypes.h"
-#include <cstddef>
-#include <cstdio>
+
+EthernetUDP udp = EthernetUDP();
 
 Networking::Networking(bool launch, bool test){
     if (!launch) return;
+	Logger::info(F("Ethernet init... "));
     Ethernet.init(m_csPin);
+	Logger::info(F(Ethernet.begin(mac, 10000, 5000)==1 ? "Success!\n\r" : "Failed!\n\r"));
 	if (Ethernet.hardwareStatus() == EthernetNoHardware) {
 	  Logger::warn(F("Ethernet controller was not found. If the next message is \"Ethernet init... Success!\" then you can ignore this message\n\r"));
-      Logger::warn("Chip ID: " + String(W5100.getChip()));
 	}
 	else if (Ethernet.hardwareStatus() == EthernetW5100) {
-	  Logger::warn(F("W5100 Ethernet controller detected.\n\r"));
+	  Logger::info(F("W5100 Ethernet controller detected.\n\r"));
 	}
 	else if (Ethernet.hardwareStatus() == EthernetW5200) {
-	  Logger::warn(F("W5200 Ethernet controller detected.\n\r"));
+	  Logger::info(F("W5200 Ethernet controller detected.\n\r"));
 	}
 	else if (Ethernet.hardwareStatus() == EthernetW5500) {
-	  Logger::warn(F("W5500 Ethernet controller detected.\n\r"));
+	  Logger::info(F("W5500 Ethernet controller detected.\n\r"));
 	}
-	Logger::info(F("Ethernet init... "));
-	Logger::info(F(Ethernet.begin(mac, 10000, 5000)==1 ? "Success!\n\r" : "Failed!\n\r"));
-	m_udp.begin(m_selfPort);
+	udp.begin(m_selfPort);
 }
 
-String Networking::getStatus(){
+String Networking::getConfig(){
     return "Target self IP:      " + String(m_selfIp) +
 	   "\n\rCurrent self IP: " + String(Ethernet.localIP()) +
 	   "\n\rDNS server IP:       " + String(Ethernet.dnsServerIP()) +
@@ -38,17 +34,25 @@ String Networking::getStatus(){
 	   "\n\rSubnet mask:         " + String(Ethernet.subnetMask()) +
 	   "\n\rLink status:         " + String((Ethernet.linkStatus() ? "ON" : "OFF"));
 }
+//returs true if status == LinkON
+bool Networking::getLinkStatus(){
+	return Ethernet.linkStatus() == LinkON;
+}
 
 void Networking::maintain(){
-	if (Ethernet.linkStatus() == LinkON && !m_linkUp) {
+	if (Ethernet.linkStatus() == LinkON && m_linkStatus != LinkON) {
 		Logger::info(F("Link status: On"));
-		m_linkUp = true;
+		m_linkStatus = LinkON;
 	}
-	else if (Ethernet.linkStatus() == LinkOFF && m_linkUp) {
+	else if (Ethernet.linkStatus() == LinkOFF && m_linkStatus != LinkOFF) {
 		Logger::info(F("Link status: Off. This usually indicates problems with cable"));
-		m_linkUp = false;
+		m_linkStatus = LinkOFF;
 	}
-	if ((m_linkUp && (millis() >= m_lastMaintainTime + 500)) || millis() >= m_lastMaintainTime + 5000){//if link is up -> check every half a second, otherwise check once every 5 seconds
+	else if (Ethernet.linkStatus() == Unknown && m_linkStatus != Unknown) {
+		Logger::info(F("Link status: Unknown."));
+		m_linkStatus = Unknown;
+	}
+	if ((m_linkStatus == LinkON && (millis() >= m_lastMaintainTime + 500)) || millis() >= m_lastMaintainTime + 5000){//if link is up -> check every half a second, otherwise check once every 5 seconds
 		byte status = Ethernet.maintain();
 		switch(status){
 			case 0:
@@ -63,7 +67,7 @@ void Networking::maintain(){
 				Logger::warn(F("DHCP rebind failed, check the configuration of your DHCP server"));
 				break;
 			case 4:
-				if(m_linkUp)
+				if(m_linkStatus)
 				{
 					Logger::warn(F("DHCP rebind detected, this almost certainly will break things"));
 				}
@@ -79,6 +83,7 @@ void Networking::maintain(){
 		m_lastMaintainTime = millis();
 	}	
 }
+
 void Networking::readRovControl(RovControl &ctrl) {
 	uint8_t buffer[32];
 	int size = read(buffer, 32);
@@ -100,9 +105,9 @@ void Networking::readRovControl(RovControl &ctrl) {
 void Networking::writeRovTelemetry(RovTelemetry &tel) {
     size_t i = 0;
 
-    uint8_t buffer[64];
+    uint8_t buffer[64] = {};
 
-    RovTelemetry rt = RovTelemetry(tel); 
+    RovTelemetry rt = tel; 
     helpers::swapEndianRovTelemetry(rt);
     helpers::write_bytes(buffer, i, rt.header_telemetry);
     helpers::write_bytes(buffer, i, rt.version);
@@ -118,19 +123,19 @@ void Networking::writeRovTelemetry(RovTelemetry &tel) {
 }
 
 int Networking::read(uint8_t * buffer, int size) {
-	int packetSize = m_udp.parsePacket();
+	int packetSize = udp.parsePacket();
 
 	if (packetSize) {
-		m_udp.read(buffer, size);
+		udp.read(buffer, size);
 		return packetSize;
 	}
 	return 0;
 }
 
 void Networking::write(uint8_t * buffer, int size) {
-	m_udp.beginPacket(m_remoteIp, m_remotePort);
-	m_udp.write(buffer, size);
-	m_udp.endPacket();
+	udp.beginPacket(m_remoteIp, m_remotePort);
+	udp.write(buffer, size);
+	udp.endPacket();
 }
 
 #endif

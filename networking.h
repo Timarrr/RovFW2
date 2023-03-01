@@ -2,6 +2,7 @@
 #define NETWORKING_H
 #include <Arduino.h>
 #include <Ethernet.h>
+#include "logger.h"
 #include "config.h"
 #include "helpers.h"
 #include "rovdatatypes.h"
@@ -14,7 +15,8 @@ public:
     void init();
     void readRovControl(RovControl &ctrl);
     void writeRovTelemetry(RovTelemetry &tel);
-    String getStatus();
+    String getConfig();
+    bool getLinkStatus();
 private:
     int read(uint8_t *buffer, int size);
     void write(uint8_t *buffer, int size);
@@ -23,8 +25,6 @@ private:
     byte mac[6] = {
         0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
     };
-    EthernetUDP m_udp;
-
 
     IPAddress m_selfIp = config::net::rovIP;
     uint16_t m_selfPort = config::net::rovPort; 
@@ -32,7 +32,7 @@ private:
     uint16_t m_remotePort = config::net::rcPort;
     short m_csPin = config::net::netControllerCsPin;
     long long m_lastMaintainTime;
-    bool m_linkUp;
+    EthernetLinkStatus m_linkStatus;
 };
 
 #endif

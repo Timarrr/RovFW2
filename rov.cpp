@@ -18,6 +18,9 @@ Rov::Rov() : control(new RovControl), tele(new RovTelemetry){
 
     SerialUSB.begin(115200);
     unsigned int t_on = millis() + config::serial::waitForSerialTime;
+    
+    pinMode(LED_BUILTIN, OUTPUT);
+	analogWrite(LED_BUILTIN, 100);
 
     if(config::serial::waitForSerial){
         while(!SerialUSB){
@@ -32,9 +35,6 @@ Rov::Rov() : control(new RovControl), tele(new RovTelemetry){
     }
 
     Logger::info(F("HighROV init!"));
-
-	pinMode(LED_BUILTIN, OUTPUT);
-	analogWrite(LED_BUILTIN, 100);
 
     configType curConf = config::launchConfig::currentConfig;
 
@@ -98,52 +98,35 @@ void Rov::serialHandler(){
 }
 
 void Rov::loop(){
-    Logger::debug(F("sH"));
     serialHandler();
-    Logger::debug(F("SU"));
     sensors->update();
-    Logger::debug(F("gY"));
     tele->yaw = imu->getYaw();
-    Logger::debug(F("gR"));
     tele->roll = imu->getRoll();
-    Logger::debug(F("gP"));
     tele->pitch = imu->getPitch();
-    Logger::debug(F("gD"));
     tele->depth = sensors->getDepth();
-    Logger::debug(F("gT"));
     tele->temperature = sensors->getTemperature();
-    Logger::debug(F("gA"));
     tele->ammeter = sensors->getCurrent();
-    Logger::debug(F("gV"));
     tele->voltmeter = sensors->getVoltage();
-    Logger::debug(F("cS"));
     tele->cameraIndex = control->camsel;
     
     if (config::launchConfig::currentConfig & (config::launchConfig::configType::fast | config::launchConfig::configType::full | config::launchConfig::configType::standaloneWithEthernet)) {
-        Logger::debug(F("nM"));
         networking->maintain();
-        Logger::debug(F("rRC"));
-        networking->readRovControl(*control);
-        Logger::debug(F("wRT"));   
-        networking->writeRovTelemetry(*tele);
-    }
+        if (networking->getLinkStatus()) {
+            networking->readRovControl(*control);
+            networking->writeRovTelemetry(*tele);        
+        }
 
-    Logger::debug(F("uTH"));
+    }
+    // Logger::info(F("uT"));
     thrusters->update_thrusters(*control);
 
-    Logger::debug(F("sCA0"));
     cameras->set_angle(config::cameras::servos::front, constrain(control->cameraRotation[0], -1, 1) * 3.0);
-    Logger::debug(F("sCA1"));
     cameras->set_angle(config::cameras::servos::back,  constrain(control->cameraRotation[1], -1, 1) * 3.0);
-    Logger::debug(F("seC"));
     cameras->select_cam(control->camsel == 1 ? true : false);
 
-    Logger::debug(F("mSOC"));
     manipulator->setOpenClose(control->manipulator[0]);
-    Logger::debug(F("mSR"));
     manipulator->setRotate(control->manipulator[1]);
 
-    Logger::debug(F("LED"));
     analogWrite(LED_BUILTIN, sin(millis() * 0.01) * 127 + 127);
     // Debug::debugHandler(control);
 }
