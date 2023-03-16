@@ -90,8 +90,6 @@ void Networking::readRovControl(RovControl &ctrl) {
 	
 	if (size > 0) {
         size_t i = 2; // skip header and version
-        ctrl.version = 2;
-        helpers::read_bytes(buffer, i, ctrl.auxFlags);
         helpers::read_bytes(buffer, i, ctrl.thrusterPower);
         helpers::read_bytes(buffer, i, ctrl.manipulator[1]);
         helpers::read_bytes(buffer, i, ctrl.manipulator[2]);

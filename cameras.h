@@ -10,13 +10,14 @@
 class Cameras{
 public:
     Cameras(bool launch, bool test);
-    void set_angle(int idx, int angle);
+    void set_angle_delta(int idx, int angle);
     void select_cam(bool state);
     int get_cam_index();
 private:
     int angles[2] = { 90, 90 };
-    Servo m_camServos[2];
-    long long m_lastUpdateTimes[2];
+    Servo m_frontServo;
+    Servo m_backServo;
+    long long m_lastUpdateTimes[2] = {0, 0};
     bool cam_switch = false;
 };
 

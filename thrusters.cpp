@@ -7,7 +7,8 @@
 #include "config.h"
 #include "isrcontroller.h"
 #include "logger.h"
-#define THRUSTER_TEST_WAIT_TIME 250
+#define THRUSTER_TEST_WAIT_TIME 100
+#define THRUSTER_POWER_COEFF 0.3f
 
 Thrusters::Thrusters(bool launch, bool test){
     if (!launch){
@@ -23,18 +24,22 @@ Thrusters::Thrusters(bool launch, bool test){
 
 void Thrusters::test(){
     Logger::info(F("Testing thrusters:"));
-    for (int i = 0; i < 8; i++) {
-        Logger::info("Set thruster " + String(i) + " to -100");
-        m_controller.setThruster(i, -100);
+    for (int i = 0; i < 4; i++) {
+        Logger::info("Set thruster pair " + String(i) + " to -100");
+        m_controller.setThruster(i, -100 * THRUSTER_POWER_COEFF);
+        m_controller.setThruster(i+1, -100 * THRUSTER_POWER_COEFF);
         delay(THRUSTER_TEST_WAIT_TIME);
-        Logger::info("Set thruster " + String(i) + " to 0");
+        Logger::info("Set thruster pair " + String(i) + " to 0");
         m_controller.setThruster(i, 0);
+        m_controller.setThruster(i+1, 0);
         delay(THRUSTER_TEST_WAIT_TIME);
-        Logger::info("Set thruster " + String(i) + " to 100");
-        m_controller.setThruster(i, 100);        
+        Logger::info("Set thruster pair " + String(i) + " to 100");
+        m_controller.setThruster(i, 100 * THRUSTER_POWER_COEFF);        
+        m_controller.setThruster(i+1, 100 * THRUSTER_POWER_COEFF);        
         delay(THRUSTER_TEST_WAIT_TIME);
-        Logger::info("Set thruster " + String(i) + " to 0");
+        Logger::info("Set thruster pair " + String(i) + " to 0");
         m_controller.setThruster(i, 0);
+        m_controller.setThruster(i+1, 0);
         delay(THRUSTER_TEST_WAIT_TIME);
     }
 }

@@ -5,8 +5,8 @@
 
 struct RovControl
 {
-    int8_t header = 0xAC;
-    uint8_t version = 2;
+    static const int8_t header = 0xAC;
+    static const uint8_t version = 2;
     uint8_t auxFlags = 0b00000000;
     int8_t thrusterPower[10] = {0,0,0,0,0,0,0,0,0,0};
     int8_t cameraRotation[2] = {0,0}; // front, rear

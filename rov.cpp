@@ -67,7 +67,7 @@ Rov::Rov() : control(new RovControl), tele(new RovTelemetry){
     Logger::info("Memory used: " + String(freeMemory()));
     thrusters = new Thrusters(true, true);
     Logger::info("Memory used: " + String(freeMemory()));
-    sensors = new Sensors(true, true, true);
+    sensors = new Sensors(true, true, false);
     Logger::info("Memory used: " + String(freeMemory()));
     imu = new IMUSensor(true, true);
     Logger::info("Memory used: " + String(freeMemory()));
@@ -93,7 +93,7 @@ void Rov::serialHandler(){
                 asm("nop");
                 // Debug::debugMenu();
 			else
-				Logger::info(F("send \"reset\" for controller reset or \"debug\" for debug menu [DISABLED]"));
+				Logger::info(F("send \"reset\" for controller reset or \"debug\" for debug menu [NIY]"));
 	}
 }
 
@@ -115,14 +115,13 @@ void Rov::loop(){
             networking->readRovControl(*control);
             networking->writeRovTelemetry(*tele);        
         }
-
     }
-    // Logger::info(F("uT"));
     thrusters->update_thrusters(*control);
 
-    cameras->set_angle(config::cameras::servos::front, constrain(control->cameraRotation[0], -1, 1) * 3.0);
-    cameras->set_angle(config::cameras::servos::back,  constrain(control->cameraRotation[1], -1, 1) * 3.0);
-    cameras->select_cam(control->camsel == 1 ? true : false);
+    cameras->set_angle_delta(0, constrain(control->cameraRotation[0], -1, 1) * 3.0);
+    cameras->set_angle_delta(1,  constrain(control->cameraRotation[1], -1, 1) * 3.0);
+    cameras->select_cam(control->camsel == 1);
+    Logger::trace("CamSel: " + String(control->camsel));
 
     manipulator->setOpenClose(control->manipulator[0]);
     manipulator->setRotate(control->manipulator[1]);

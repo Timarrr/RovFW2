@@ -10,13 +10,15 @@ Sensors::Sensors(bool launch, bool test, bool ds_init){
     if(!ds_init) return;
 
     Logger::info(F("Depth sensor init"));
-    if (!m_depthSensor.init()) {
-        Logger::warn(F("Depth sensor init failed! Will retry init on next read"));
-        return;
-    }
-    m_depthSensorEnabled = true;
+    m_depthSensorEnabled = ds_init;
     m_depthSensor.setModel(MS5837::MS5837_30BA);
     m_depthSensor.setFluidDensity(997); // kg/m^3 (997 for freshwater, 1029 for seawater)
+    if (ds_init){
+        if (!m_depthSensor.init()) {
+            Logger::warn(F("Depth sensor init failed! Will retry init on next read"));
+            return;
+        }
+    }
 }
 
 void Sensors::update() {
@@ -33,7 +35,7 @@ void Sensors::update() {
     m_current += curAmperage;
     m_current /= 2;
 
-    if (m_depthSensorEnabled && (millis() - m_lastDepthUpdateMs) > 200) {
+    if (m_depthSensorEnabled && (millis() - m_lastDepthUpdateMs) > 50) {
         m_depthSensor.read();
         m_lastDepthUpdateMs = millis();
 
@@ -48,7 +50,7 @@ void Sensors::update() {
             Wire.begin();
             Wire.setTimeout(1000);
             Wire.setClock(10000);
-            init();
+            m_depthSensor.init();
         }
     }
 }

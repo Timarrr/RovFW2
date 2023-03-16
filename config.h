@@ -28,14 +28,14 @@ namespace config {
     namespace cameras {
         constexpr int multiplexer_pin = 10;
         enum servos {
-            front = 0,
-            back,
-            pwm_a2,
-            pwm_a3,
+            front = A4,
+            back = A5,
+            pwm_a2 = 2,
+            pwm_a3 = 3,
         };
     }
     namespace thrusters {
-        constexpr int pins[10] = {3,9,8,7,2,6,4,5};//10,11};
+        constexpr int pins[10] = {3,9,8,7,2,6,4,5};
         enum thrusters {
             horizontal_front_left = 0,
             horizontal_front_right,
