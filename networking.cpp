@@ -2,7 +2,10 @@
 #define NETWORKING_CPP
 #include "networking.h"
 #include "Ethernet.h"
+#include "helpers.h"
 #include "logger.h"
+#include "rovdatatypes.h"
+#include <cstdint>
 
 EthernetUDP udp = EthernetUDP();
 
@@ -84,20 +87,36 @@ void Networking::maintain(){
 	}	
 }
 
-void Networking::readRovControl(RovControl &ctrl) {
+void Networking::readRovControl(RovControl &ctrl, RovAuxControl &auxCtrl) {
 	uint8_t buffer[32];
-	int size = read(buffer, 32);
-	
-	if (size > 0) {
-        size_t i = 2; // skip header and version
-        helpers::read_bytes(buffer, i, ctrl.thrusterPower);
-        helpers::read_bytes(buffer, i, ctrl.manipulator[1]);
-        helpers::read_bytes(buffer, i, ctrl.manipulator[2]);
-        helpers::read_bytes(buffer, i, ctrl.cameraRotation[0]);
-        helpers::read_bytes(buffer, i, ctrl.cameraRotation[1]);
-        helpers::read_bytes(buffer, i, ctrl.camsel);
-        
-	}
+	int size = 0;
+	do{
+		size = read(buffer, 32);
+		
+		if (size > 0) {
+			size_t i = 0;
+			int8_t header = 0;
+			helpers::read_bytes(buffer, i, header);
+			if (header == ctrl.header) { //yup that's a control message 
+				i+=1;//skip version
+				helpers::read_bytes(buffer, i, ctrl.thrusterPower);
+				helpers::read_bytes(buffer, i, ctrl.manipulator[1]);
+				helpers::read_bytes(buffer, i, ctrl.manipulator[2]);
+				helpers::read_bytes(buffer, i, ctrl.cameraRotation[0]);
+				helpers::read_bytes(buffer, i, ctrl.cameraRotation[1]);
+				helpers::read_bytes(buffer, i, ctrl.camsel);		
+			}
+			else if (header == auxCtrl.header) { // yup that's an auxControl message
+				helpers::read_bytes(buffer, i, auxCtrl.auxFlags);
+				helpers::read_bytes(buffer, i, auxCtrl.dDepth);
+				helpers::read_bytes(buffer, i, auxCtrl.dYaw);
+				helpers::read_bytes(buffer, i, auxCtrl.dRoll);
+				helpers::read_bytes(buffer, i, auxCtrl.dPitch);
+			}
+
+			
+		}
+	} while (size>0);
 }  
 
 void Networking::writeRovTelemetry(RovTelemetry &tel) {

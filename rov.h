@@ -29,6 +29,7 @@ class Rov{
         ISRController *isr;
         RovTelemetry *tele;
         RovControl *control;
+        RovAuxControl *auxControl;
 
 };
 

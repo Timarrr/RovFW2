@@ -56,10 +56,12 @@ namespace config {
     namespace launchConfig {
         enum configType{
             full = 0b10000000,
+            fast = 0b01000000,
             standalone = 0b00000001,
             standaloneWithEthernet = 0b00000010,
             standaloneWithDepth = 0b00000100,
-            fast = 0b00001000
+            initEthernet = full | fast | standaloneWithEthernet,
+            initDepth = full | fast | standaloneWithDepth
         };    
         constexpr configType currentConfig = full;
     }

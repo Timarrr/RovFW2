@@ -7,13 +7,19 @@ using namespace IMUHelpers;
 
 Uart SerialImu (&sercom1, 12, 11, SERCOM_RX_PAD_3, UART_TX_PAD_0);
 
+size_t update_pointer = 0; 
+int fuck = 0;
+
+void SERCOM1_Handler() {
+    SerialImu.IrqHandler();
+    fuck += 1;
+}
+
 IMUSensor::IMUSensor(bool launch, bool test){
-    Logger::info(F("IMU init"));
-    pinPeripheral(11, PIO_SERCOM);
-    Logger::info(F("SetP12"));
-    pinPeripheral(12, PIO_SERCOM);
-    Logger::info(F("ISBegin"));
+    Logger::info("IMU init");
     SerialImu.begin(115200);
+    pinPeripheral(11, PIO_SERCOM);
+    pinPeripheral(12, PIO_SERCOM);
 }
 
 void IMUSensor::imuCrc16Update(uint16_t *currentCrc, const uint8_t *src, uint32_t lengthInBytes)
@@ -154,7 +160,7 @@ void IMUSensor::update()
 {
     if (SerialImu.available()) {
         while (SerialImu.available())
-        {
+        {   
             char ch = SerialImu.read();
             this->imuPacketDecode(ch);
         }

@@ -13,7 +13,7 @@ public:
     Networking(bool launch, bool test);
     void maintain();
     void init();
-    void readRovControl(RovControl &ctrl);
+    void readRovControl(RovControl &ctrl, RovAuxControl &auxCtrl);
     void writeRovTelemetry(RovTelemetry &tel);
     String getConfig();
     bool getLinkStatus();

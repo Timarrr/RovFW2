@@ -13,11 +13,9 @@ Sensors::Sensors(bool launch, bool test, bool ds_init){
     m_depthSensorEnabled = ds_init;
     m_depthSensor.setModel(MS5837::MS5837_30BA);
     m_depthSensor.setFluidDensity(997); // kg/m^3 (997 for freshwater, 1029 for seawater)
-    if (ds_init){
-        if (!m_depthSensor.init()) {
-            Logger::warn(F("Depth sensor init failed! Will retry init on next read"));
-            return;
-        }
+    if (!m_depthSensor.init()) {
+        Logger::warn(F("Depth sensor init failed! Will retry init on next read"));
+        return;
     }
 }
 

@@ -36,22 +36,22 @@ Rov::Rov() : control(new RovControl), tele(new RovTelemetry){
 
     Logger::info(F("HighROV init!"));
 
-    configType curConf = config::launchConfig::currentConfig;
+    configType curConf = currentConfig;
 
     switch (curConf) {
-        case config::launchConfig::fast: //launch everything, test nothing
+        case fast: //launch everything, test nothing
             Logger::info(F("Fast startup selected"));
             break;
-        case configType::full: //launch and test everything 
+        case full: //launch and test everything 
             Logger::info(F("Full startup selected"));
             break;
-        case configType::standaloneWithDepth: //don't launch anything except for depth sensor
+        case standaloneWithDepth: //don't launch anything except for depth sensor
             Logger::info(F("Standalone startup with forced depth sensor init selected"));
             break;
-        case config::launchConfig::standaloneWithEthernet: //don't launch anything except for ethernet
+        case standaloneWithEthernet: //don't launch anything except for ethernet
             Logger::info(F("Standalone startup with forced networking init selected"));
             break;
-        case config::launchConfig::standalone: //don't launch anything  
+        case standalone: //don't launch anything  
             Logger::info(F("Standalone startup selected"));
             break;
         default:
@@ -59,21 +59,18 @@ Rov::Rov() : control(new RovControl), tele(new RovTelemetry){
             while (true);        
     }
 
-    Logger::warn(F("Overriding startup config to full"));
-    curConf = config::launchConfig::full;
-
     Logger::info("Memory used: " + String(freeMemory()));
-    networking = new Networking(true, true);
+    networking = new Networking(curConf & initEthernet, curConf & (full | standaloneWithEthernet));
     Logger::info("Memory used: " + String(freeMemory()));
-    thrusters = new Thrusters(true, true);
+    thrusters = new Thrusters(curConf & (full | fast), curConf & full);
     Logger::info("Memory used: " + String(freeMemory()));
-    sensors = new Sensors(true, true, false);
+    sensors = new Sensors(curConf & (full | fast), curConf & full, curConf & initDepth);
     Logger::info("Memory used: " + String(freeMemory()));
-    imu = new IMUSensor(true, true);
+    imu = new IMUSensor(curConf & (full | fast), curConf & full);
     Logger::info("Memory used: " + String(freeMemory()));
-    cameras = new Cameras(true, true);
+    cameras = new Cameras(curConf & (full | fast), curConf & full);
     Logger::info("Memory used: " + String(freeMemory()));
-    manipulator = new Manipulator(true, true);
+    manipulator = new Manipulator(curConf & (full | fast), curConf & full);
     Logger::info("Memory used: " + String(freeMemory()));
 }
 
@@ -100,6 +97,7 @@ void Rov::serialHandler(){
 void Rov::loop(){
     serialHandler();
     sensors->update();
+    imu->update();
     tele->yaw = imu->getYaw();
     tele->roll = imu->getRoll();
     tele->pitch = imu->getPitch();
@@ -112,7 +110,7 @@ void Rov::loop(){
     if (config::launchConfig::currentConfig & (config::launchConfig::configType::fast | config::launchConfig::configType::full | config::launchConfig::configType::standaloneWithEthernet)) {
         networking->maintain();
         if (networking->getLinkStatus()) {
-            networking->readRovControl(*control);
+            networking->readRovControl(*control, *auxControl);
             networking->writeRovTelemetry(*tele);        
         }
     }
@@ -121,8 +119,6 @@ void Rov::loop(){
     cameras->set_angle_delta(0, constrain(control->cameraRotation[0], -1, 1) * 3.0);
     cameras->set_angle_delta(1,  constrain(control->cameraRotation[1], -1, 1) * 3.0);
     cameras->select_cam(control->camsel == 1);
-    Logger::trace("CamSel: " + String(control->camsel));
-
     manipulator->setOpenClose(control->manipulator[0]);
     manipulator->setRotate(control->manipulator[1]);
 

@@ -2,6 +2,8 @@
 #define ROVDATATYPES_H
 
 #include <Arduino.h>
+#include <cmath>
+#include <cstdint>
 
 struct RovControl
 {
@@ -13,6 +15,17 @@ struct RovControl
     int8_t manipulator[2] = {0,0}; // open/close, rotate
     int8_t camsel = false;
     RovControl(){}
+};
+
+struct RovAuxControl
+{
+    int8_t header = 0xAD;
+    int8_t auxFlags = 0b00000000;
+    float dDepth = 0;
+    float dYaw = 0;
+    float dRoll = 0;
+    float dPitch = 0;
+    RovAuxControl(){};
 };
 
 struct RovTelemetry
