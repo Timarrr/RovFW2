@@ -4,6 +4,8 @@
 #include "USB/USBAPI.h"
 #include "config.h"
 #include "logger.h"
+#include <cstdint>
+#include <cmath>
 
 
 Sensors::Sensors(bool launch, bool test, bool ds_init){
@@ -25,31 +27,34 @@ void Sensors::update() {
     int rawVoltage = analogRead(voltmeter_pin);
     int rawAmperage = analogRead(ammeter_pin);
 
-    float curVoltage = round(rawVoltage * (voltage_multiplier * 100.0)) / 100.0;
-    float curAmperage = round((rawAmperage - amperage_deflection) * (amperage_multiplier * 100.0)) / 100.0;
-
-    m_voltage += curVoltage;
+    m_voltage += rawVoltage * voltage_multiplier;
     m_voltage /= 2;
-    m_current += curAmperage;
+    m_current += (rawAmperage - amperage_deflection) * amperage_multiplier;
     m_current /= 2;
+    
+    if (m_depthSensorEnabled){
+        if((millis() - m_lastDepthUpdateMs) > 50) {
+            m_depthSensor.read();
+            m_lastDepthUpdateMs = millis();
 
-    if (m_depthSensorEnabled && (millis() - m_lastDepthUpdateMs) > 50) {
-        m_depthSensor.read();
-        m_lastDepthUpdateMs = millis();
+            if (abs(m_depthSensor.depth()) < 150) {
+                m_depth = m_depthSensor.depth();
+                m_temp = m_depthSensor.temperature();
+            } else { // don't accept value if value is too big (probably corrupted data)
+                Logger::warn(F("Depth sensor read error. Retrying init"));
 
-        if (abs(m_depthSensor.depth()) < 150) {
-            m_depth = m_depthSensor.depth();
-            m_temp = m_depthSensor.temperature();
-        } else { // don't accept value if value is too big (probably corrupted data)
-            Logger::warn(F("Depth sensor read error. Retrying init"));
-
-            // trying to reset I2C and init sensor again.
-            Wire.end();
-            Wire.begin();
-            Wire.setTimeout(1000);
-            Wire.setClock(10000);
-            m_depthSensor.init();
+                // trying to reset I2C and init sensor again.
+                Wire.end();
+                Wire.begin();
+                Wire.setTimeout(1000);
+                Wire.setClock(10000);
+                m_depthSensor.init();
+            }
         }
+    }
+    else {
+        m_depth = MAXFLOAT;
+
     }
 }
 

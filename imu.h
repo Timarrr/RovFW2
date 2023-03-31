@@ -1,8 +1,20 @@
+/**
+ * @file imu.h
+ * @author Thankfully not Timarrr (tigrmango@gmail.com)
+ * @brief Abomination of code that somebody wrote probably high on something. 
+ * @version 0.1
+ * @date 2023-03-31
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
+
 #ifndef IMU_H
 #define IMU_H
 #include "Uart.h"
 #include <Arduino.h>
 #define IMU_MAX_PACKET_LEN 256
+
 
 namespace IMUHelpers {
     enum status {
@@ -45,6 +57,11 @@ namespace IMUHelpers {
         uint8_t type;
     } Packet_t;
 }
+
+/**
+ * @brief I am \b {NOT} documenting this... Yet
+ * 
+ */
 class IMUSensor{
 public:
     IMUSensor(bool launch, bool test);

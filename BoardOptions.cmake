@@ -55,8 +55,8 @@
 # set(ARDUINO_BOARD "Arduino MKR Vidor 4000 [samd.mkrvidor4000]") # Arduino MKR Vidor 4000
 # set(ARDUINO_BOARD "Adafruit Circuit Playground Express [samd.adafruit_circuitplayground_m0]") # Adafruit Circuit Playground Express
 # set(ARDUINO_BOARD "Arduino M0 Pro (Programming Port) [samd.mzero_pro_bl_dbg]") # Arduino M0 Pro (Programming Port)
-set(ARDUINO_BOARD "Arduino M0 Pro (Native USB Port) [samd.mzero_pro_bl]") # Arduino M0 Pro (Native USB Port)
-# set(ARDUINO_BOARD "Arduino M0 [samd.mzero_bl]") # Arduino M0
+# set(ARDUINO_BOARD "Arduino M0 Pro (Native USB Port) [samd.mzero_pro_bl]") # Arduino M0 Pro (Native USB Port)
+set(ARDUINO_BOARD "Arduino M0 [samd.mzero_bl]") # Arduino M0
 # set(ARDUINO_BOARD "Arduino Tian [samd.tian]") # Arduino Tian
 
 #==============================================================================

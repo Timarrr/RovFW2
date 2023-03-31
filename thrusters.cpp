@@ -10,7 +10,7 @@
 #define THRUSTER_TEST_WAIT_TIME 100
 #define THRUSTER_POWER_COEFF 0.3f
 
-Thrusters::Thrusters(bool launch, bool test){
+Thrusters::Thrusters(bool launch, bool test, long &init_ms_remmaining){
     if (!launch){
         Logger::info(F("Thrusters init cancelled"));
         return;
@@ -18,29 +18,26 @@ Thrusters::Thrusters(bool launch, bool test){
     Logger::info(F("Waiting for thrusters init..."));
     delay(8000);
     Logger::info(F("  Done!"));
-    if (test)
-        this->test();
-}
-
-void Thrusters::test(){
-    Logger::info(F("Testing thrusters:"));
-    for (int i = 0; i < 4; i++) {
-        Logger::info("Set thruster pair " + String(i) + " to -100");
-        m_controller.setThruster(i, -100 * THRUSTER_POWER_COEFF);
-        m_controller.setThruster(i+1, -100 * THRUSTER_POWER_COEFF);
-        delay(THRUSTER_TEST_WAIT_TIME);
-        Logger::info("Set thruster pair " + String(i) + " to 0");
-        m_controller.setThruster(i, 0);
-        m_controller.setThruster(i+1, 0);
-        delay(THRUSTER_TEST_WAIT_TIME);
-        Logger::info("Set thruster pair " + String(i) + " to 100");
-        m_controller.setThruster(i, 100 * THRUSTER_POWER_COEFF);        
-        m_controller.setThruster(i+1, 100 * THRUSTER_POWER_COEFF);        
-        delay(THRUSTER_TEST_WAIT_TIME);
-        Logger::info("Set thruster pair " + String(i) + " to 0");
-        m_controller.setThruster(i, 0);
-        m_controller.setThruster(i+1, 0);
-        delay(THRUSTER_TEST_WAIT_TIME);
+    if (test){
+        Logger::info(F("Testing thrusters:"));
+        for (int i = 0; i < 4; i++) {
+            Logger::info("Set thruster pair " + String(i) + " to -100");
+            m_controller.setThruster(i, -100 * THRUSTER_POWER_COEFF);
+            m_controller.setThruster(i+1, -100 * THRUSTER_POWER_COEFF);
+            delay(THRUSTER_TEST_WAIT_TIME);
+            Logger::info("Set thruster pair " + String(i) + " to 0");
+            m_controller.setThruster(i, 0);
+            m_controller.setThruster(i+1, 0);
+            delay(THRUSTER_TEST_WAIT_TIME);
+            Logger::info("Set thruster pair " + String(i) + " to 100");
+            m_controller.setThruster(i, 100 * THRUSTER_POWER_COEFF);        
+            m_controller.setThruster(i+1, 100 * THRUSTER_POWER_COEFF);        
+            delay(THRUSTER_TEST_WAIT_TIME);
+            Logger::info("Set thruster pair " + String(i) + " to 0");
+            m_controller.setThruster(i, 0);
+            m_controller.setThruster(i+1, 0);
+            delay(THRUSTER_TEST_WAIT_TIME);
+        }
     }
 }
 

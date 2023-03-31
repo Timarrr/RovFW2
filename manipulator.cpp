@@ -7,12 +7,16 @@
 #include "Wire.h"
 #include "api/Common.h"
 #include "logger.h"
+
+
 Manipulator::Manipulator(bool launch, bool test) : m_pca(new PCA9536()){
     if (!launch) return;
 
     Logger::info(F("Manipulator init"));
     if (m_pca->begin(Wire) == false) {
         Logger::error(F("PCA9536 not detected or failed to init! Check the I2C connection and reset the ROV"));
+        defunct = true;
+        return;
     }
     for (int i = 0; i < 4; i++) {
         m_pca->pinMode(i, OUTPUT);
@@ -33,20 +37,21 @@ Manipulator::Manipulator(bool launch, bool test) : m_pca(new PCA9536()){
 }
 
 void Manipulator::setOpenClose(int delta){
+    if(defunct) return;
     using namespace config::manipulator;
     int maxSpeed = 100;
-    // Logger::info(F("setOpenClose()"));
     set(manip_release_ch, manip_grab_ch, constrain(delta * 100, -maxSpeed, maxSpeed));
 }
 
 void Manipulator::setRotate(int delta){
+    if(defunct) return;
     using namespace config::manipulator;
     int maxSpeed = 100;
-    // Logger::info(F("setRotate()"));
     set(manip_left_ch, manip_right_ch, constrain(delta * 100, -maxSpeed, maxSpeed));
 }
 
 inline void Manipulator::set(int ch1, int ch2, int power) {
+    if(defunct) return;
     if (power == 0) {
         writePCA(ch1, 0);
         writePCA(ch2, 0);
@@ -64,6 +69,7 @@ inline void Manipulator::set(int ch1, int ch2, int power) {
     }
 }
 inline void Manipulator::writePCA(int ch, int power){
+    if(defunct) return;
     int state = LOW;
     if (abs(power) >= 50) {
         state = HIGH;

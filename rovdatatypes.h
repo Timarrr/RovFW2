@@ -1,52 +1,161 @@
 #ifndef ROVDATATYPES_H
 #define ROVDATATYPES_H
 
+#include "avr/pgmspace.h"
 #include <Arduino.h>
 #include <cmath>
 #include <cstdint>
 
+/*!
+ * \brief The RovControl struct is used for ordering of the data used by RovUI to control the ROV
+ */
 struct RovControl
 {
-    static const int8_t header = 0xAC;
-    static const uint8_t version = 2;
-    uint8_t auxFlags = 0b00000000;
+    /*!
+     * \brief Header of the packet, used for distinguishing it from other types of packets
+     */
+    const static int8_t header = 0xAC;
+    /*!
+     * \brief Version of the protocol used by the RovUI and ROV to communicate
+     * \todo Implement handshake protocol
+     */
+    uint8_t version = 2;
+    /*!
+     * \brief Thrusters power to be set on the ROV
+     */
     int8_t thrusterPower[10] = {0,0,0,0,0,0,0,0,0,0};
-    int8_t cameraRotation[2] = {0,0}; // front, rear
-    int8_t manipulator[2] = {0,0}; // open/close, rotate
+    /*!
+     * \brief Pending camera rotation (<0 is down, >0 is up): 1st is for the front camera, 2nd is for the rear one
+     */
+    int8_t cameraRotationDelta[2] = {0,0};
+    /*!
+     * \brief Pending manipulator action (<0 is open, >0 is close)
+     */
+    int8_t manipulatorOpenClose = 0;
+    /*!
+     * \brief Pending manipultor action (<0 is CCW, >0 is CW)
+     */
+    int8_t manipulatorRotate = 0;
+    /*!
+     * \brief Camera select variable (false is front camera, true is back camera)
+     */
     int8_t camsel = false;
+    /*!
+     * \brief Default constructor
+     */
     RovControl(){}
 };
 
+/*!
+ * \brief The RovAuxControl struct is used for controlling the auxiliary data used by RovUI to control the ROV
+ */
 struct RovAuxControl
 {
-    int8_t header = 0xAD;
+    /*!
+     * \brief Header of the packet, used for distinguishing it from other types of packets
+     */
+    const static int8_t header = 0xAD;
+    /*!
+     * \brief Auxilary flags, used to control the regulators, and possibly something else
+     */
     int8_t auxFlags = 0b00000000;
+    /*!
+     * \brief Desired depth
+     */
     float dDepth = 0;
+    /*!
+     * \brief Desired yaw
+     */
     float dYaw = 0;
+    /*!
+     * \brief Desired roll
+     */
     float dRoll = 0;
+    /*!
+     * \brief Desired pitch
+     */
     float dPitch = 0;
+    /*!
+     * \brief Default constructor
+     */
     RovAuxControl(){};
 };
 
-struct RovTelemetry
+/*!
+ * \brief The RovHeartBeat struct is used for ordering of the data with the heartbeat signals coming from the ROV
+ */
+struct RovHeartBeat
 {
-    static const uint8_t header_telemetry = 0xAE;
-    enum ErrorCode{
-        NoError,
-        WrongCrc //TODO: maybe add smth else
-    };
-    uint8_t header = 0;
-    int8_t version = 2;
-    float depth = 0.0f;
-    float pitch = 0; //! -180/180;
-    float yaw = 0; //! 0 - 360;
-    float roll = 0; //! -180/180;
-    float ammeter = 0.0f;
-    float voltmeter = 0.0f;
-    int8_t cameraIndex = 0; //! 0 / 1 video multiplexer
-    float temperature = 0.0f;
-    ErrorCode ec = NoError;
-    RovTelemetry() {}
+    /*!
+     * \brief Header of the packet, used for distinguishing it from other types of packets
+     */
+    const static int8_t header = 0xAF;
+
+    /*!
+     * \brief Milliseconds from the start of the ROV
+     */
+    uint64_t millis = 0;
+    /*!
+     * \brief Sequence number, used to detect possible network failures
+     */
+    int8_t seqNumber = 0;
 };
 
+/*!
+ * \brief The RovTelemetry struct is used for ordering of the data with the telemetry coming from the ROV
+ */
+struct RovTelemetry
+{
+    /*!
+     * \brief Header of the packet, used for distinguishing it from other types of packets
+     */
+    const static int8_t header = 0xAE;
+    /*!
+     * \brief Version of the protocol used by the RovUI and ROV to communicate
+     * \todo Implement handshake protocol
+     */
+    int8_t version = 2;
+    /*!
+     * \brief Depth data from the ROV
+     */
+    float depth = 0.0f;
+    /*!
+     * \brief Pitch angle data from the ROV
+     * Valid values are from -180 to 180, in degrees
+     * \image html rov_pitch_img.png
+     */
+    float pitch = 0;
+    /*!
+     * \brief Yaw angle data from the ROV
+     * Valid values are from 0 to 360, in degrees
+     * \image html rov_yaw_img.png
+     */
+    float yaw = 0;
+    /*!
+     * \brief Roll angle data from the ROV
+     * Valid values are from -180 to 180, in degrees
+     * \image html rov_roll_img.png
+     */
+    float roll = 0;
+    /*!
+     * \brief Current consumption data from the ROV, in A
+     * \b {SHOULD BE LESS THAN 25A}
+     */
+    float current = 0.0f;
+    /*!
+     * \brief Voltage coming to the ROV, in V
+     * \b {SHOULD BE NO LESS THAN 6V AND NO MORE THAN 12V}
+     */
+    float voltage = 0.0f;
+    /*!
+     * \see RovControl.camsel
+     */
+    int8_t cameraIndex = 0;
+    /*!
+     * \brief Temperature data from the ROV
+     * Temperature sensor is located outside the electronics enclosure
+     */
+    float temperature = 0.0f;
+    RovTelemetry() {}
+};
 #endif // ROVDATATYPES_H

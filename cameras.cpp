@@ -37,8 +37,8 @@ void Cameras::set_angle_delta(int idx, int angle_delta) {
     }
 }
 
-void Cameras::select_cam(bool state){
-    digitalWrite(config::cameras::multiplexer_pin, state);
+void Cameras::select_cam(int index){
+    digitalWrite(config::cameras::multiplexer_pin, index);
 }
 
 #endif

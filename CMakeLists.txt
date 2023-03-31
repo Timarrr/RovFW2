@@ -3,7 +3,7 @@ project("HighROV-MATE" VERSION 0.7)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_compile_options(-I/usr/arm-none-eabi/include/ -felide-constructors -O2)
+add_compile_options(-I/usr/arm-none-eabi/include/ -felide-constructors -O3)
 
 add_subdirectory(SAMD_ISR_Servo/)
 

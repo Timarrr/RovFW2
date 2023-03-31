@@ -3,16 +3,13 @@
 #include "imu.h"
 #include "logger.h"
 #include "wiring_private.h"
+
 using namespace IMUHelpers;
 
 Uart SerialImu (&sercom1, 12, 11, SERCOM_RX_PAD_3, UART_TX_PAD_0);
 
-size_t update_pointer = 0; 
-int fuck = 0;
-
 void SERCOM1_Handler() {
     SerialImu.IrqHandler();
-    fuck += 1;
 }
 
 IMUSensor::IMUSensor(bool launch, bool test){
@@ -44,7 +41,13 @@ void IMUSensor::imuCrc16Update(uint16_t *currentCrc, const uint8_t *src, uint32_
     *currentCrc = crc;
 }
 
-
+/**
+ * @brief fuck... 
+ *
+ * 
+ * @param c 
+ * @return uint32_t 
+ */
 uint32_t IMUSensor::imuPacketDecode(uint8_t c)
 {
     static uint16_t CRCReceived = 0; /* CRC value received from a frame */

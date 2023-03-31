@@ -1,41 +1,154 @@
+/**
+ * @file config.h
+ * @author Timarrr (tigrmango@gmail.com)
+ * @brief ROV config
+ * @version 0.1
+ * @date 2023-03-31
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
 #ifndef CONFIG_H
 #define CONFIG_H
 #include <Arduino.h>
-
+/**
+ * @brief Config namespace, responsible for the ROV's loadout and pinout
+ * 
+ */
 namespace config {
+    /**
+     * @brief Network sub-namespace, responsible for IPs and ports of ROV and RC
+     * 
+     */
     namespace net {
+        /**
+         * @brief ROV's IP address in an array
+         * 
+         */
         constexpr uint8_t rovIP[4] = {192, 168, 1, 5};
+
+        /**
+         * @brief ROV's port
+         * 
+         */
         constexpr uint16_t rovPort = 3010;
+
+        /**
+         * @brief RC's IP address in an array
+         * 
+         */
         constexpr uint8_t rcIP[4] = {192, 168, 1, 4};
+
+        /**
+         * @brief RC's port
+         * 
+         */
         constexpr uint16_t rcPort = 3010;
+
+        /**
+         * @brief CS pin for the W5xxx network controller
+         * 
+         */
         constexpr uint8_t netControllerCsPin = 43; // W5500 CS on PA13 pin
     }
+
+    /**
+     * @brief Pins and various settings of the sensors subsystem 
+     * 
+     */
     namespace sensors {
+
+        /**
+         * @brief Pin of the analog ammeter
+         * 
+         */
         constexpr int ammeter_pin = A0;
+
+        /**
+         * @brief Pin of the analog voltmeter
+         * 
+         */
         constexpr int voltmeter_pin = A1;
 
-        constexpr double voltage_multiplier  = 0.016064;
-        constexpr double amperage_multiplier = 0.077821;
-        constexpr double amperage_deflection = 512.0;
+        /**
+         * @brief Adjusting constant for the ammeter
+         * 
+         */
+        constexpr float amperage_multiplier = 0.077821;
+
+        /**
+         * @brief Another adjusting constant for the ammeter
+         * 
+         */
+        constexpr int amperage_deflection = 512;
+
+        /**
+         * @brief Adjusting constant for the voltmeter
+         * 
+         */
+        constexpr float voltage_multiplier  = 0.016064;
     }
+
+    /**
+     * @brief Manipulator channels' settings
+     * 
+     */
     namespace manipulator {
+        /**
+         * @brief Manipulator grabbing channel
+         * 
+         */
         constexpr int manip_grab_ch     = 0;
+
+        /**
+         * @brief Manipulator releasing channel
+         * 
+         */
         constexpr int manip_release_ch  = 1;
 
+        /**
+         * @brief Manipulator CCW rotation channel
+         * 
+         */
         constexpr int manip_left_ch     = 2;
+
+        /**
+         * @brief Manipulator CW rotation channel
+         * 
+         */
         constexpr int manip_right_ch    = 3;
     }
+
+    /**
+     * @brief Cameras' subsystem pins
+     * 
+     */
     namespace cameras {
+        /**
+         * @brief Multiplexer pin
+         * 
+         */
         constexpr int multiplexer_pin = 10;
+
+        /**
+         * @brief Servos' pins
+         * 
+         */
         enum servos {
             front = A4,
-            back = A5,
-            pwm_a2 = 2,
-            pwm_a3 = 3,
+            back = A5
         };
     }
+
+    /**
+     * @brief Thrusters' subsystem pinout
+     * 
+     */
     namespace thrusters {
-        constexpr int pins[10] = {3,9,8,7,2,6,4,5};
+        /**
+         * @brief Enum of thrusters
+         * @see pins 
+         */
         enum thrusters {
             horizontal_front_left = 0,
             horizontal_front_right,
@@ -45,25 +158,60 @@ namespace config {
             vertical_front_right,
             vertical_back_left,
             vertical_back_right,
-            custom_0,
-            custom_1,
         };
+
+        /**
+         * @brief Pins corresponding to the enum
+         * 
+         */
+        constexpr int pins[10] = {3,9,8,7,2,6,4,5};
+
     }
+
+    /**
+     * @brief Serial debug connection config
+     * @todo Implement connection detection proprely
+     */
     namespace serial {
-        constexpr bool waitForSerial = 1;
+        /**
+         * @brief Does the ROV wait for SerialUSB connection to PC?
+         * 
+         */
+        constexpr bool waitForSerial = true;
+
+        /**
+         * @brief If waitForSerial == true, then for how much does the ROV need to wait for the serial connection?
+         * 
+         */
         constexpr uint16_t waitForSerialTime = 5000; //ms
     }
+
+    /**
+     * @brief Launch configuration loadout
+     * 
+     */
     namespace launchConfig {
-        enum configType{
+        /**
+         * @brief Configuration enum
+         * @todo Explain how this works
+         */
+        enum launchConfig{
             full = 0b10000000,
             fast = 0b01000000,
             standalone = 0b00000001,
-            standaloneWithEthernet = 0b00000010,
-            standaloneWithDepth = 0b00000100,
-            initEthernet = full | fast | standaloneWithEthernet,
-            initDepth = full | fast | standaloneWithDepth
-        };    
-        constexpr configType currentConfig = full;
+            forceEthernet = 0b00000010,
+            forceNoEthernet = 0b00000100,
+            forceDepth = 0b00001000,
+            forceNoDepth = 0b00010000,
+            initEthernet = full | fast | forceEthernet,
+            initDepth = full | fast | forceDepth
+        };  
+
+        /**
+         * @brief Current selected configuration loadout
+         * 
+         */
+        constexpr launchConfig currentConfig = launchConfig(fast | forceNoDepth);
     }
 
 }
