@@ -10,7 +10,7 @@
 #define THRUSTER_TEST_WAIT_TIME 100
 #define THRUSTER_POWER_COEFF 0.3f
 
-Thrusters::Thrusters(bool launch, bool test, long &init_ms_remmaining){
+Thrusters::Thrusters(bool launch, bool test, long &init_ms_remaining){
     if (!launch){
         Logger::info(F("Thrusters init cancelled"));
         return;
