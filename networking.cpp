@@ -117,7 +117,6 @@ void Networking::writeRovTelemetry(RovTelemetry tel) {
     uint8_t buffer[64] = {};
 
     RovTelemetry rt = tel; 
-    helpers::swapEndianRovTelemetry(rt);
     helpers::write_bytes(buffer, i, rt.header);
     helpers::write_bytes(buffer, i, rt.version);
     helpers::write_bytes(buffer, i, rt.depth);

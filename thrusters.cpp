@@ -41,17 +41,17 @@ Thrusters::Thrusters(bool launch, bool test, long &init_ms_remaining){
     }
 }
 
-void Thrusters::update_thrusters(RovControl &ctrl) {
+void Thrusters::update(RovControl &ctrl) {
 	using namespace config::thrusters;
 
-	m_controller.setThruster(thrusters::horizontal_front_left,  ctrl.thrusterPower[0]);
-	m_controller.setThruster(thrusters::horizontal_front_right, ctrl.thrusterPower[1]);
-	m_controller.setThruster(thrusters::horizontal_back_left,   ctrl.thrusterPower[2]);
-	m_controller.setThruster(thrusters::horizontal_back_right,  ctrl.thrusterPower[3]);
-	m_controller.setThruster(thrusters::vertical_front_left,    ctrl.thrusterPower[4]);
-	m_controller.setThruster(thrusters::vertical_front_right,   ctrl.thrusterPower[5]);
-	m_controller.setThruster(thrusters::vertical_back_left,     ctrl.thrusterPower[6]);
-	m_controller.setThruster(thrusters::vertical_back_right,    ctrl.thrusterPower[7]);
+	m_controller.setThruster(thrusters::horizontal_front_left,  ctrl.thrusterPower[0] * thrusterDirections[0]);
+	m_controller.setThruster(thrusters::horizontal_front_right, ctrl.thrusterPower[1] * thrusterDirections[1]);
+	m_controller.setThruster(thrusters::horizontal_back_left,   ctrl.thrusterPower[2] * thrusterDirections[2]);
+	m_controller.setThruster(thrusters::horizontal_back_right,  ctrl.thrusterPower[3] * thrusterDirections[3]);
+	m_controller.setThruster(thrusters::vertical_front_left,    ctrl.thrusterPower[4] * thrusterDirections[4]);
+	m_controller.setThruster(thrusters::vertical_front_right,   ctrl.thrusterPower[5] * thrusterDirections[5]);
+	m_controller.setThruster(thrusters::vertical_back_left,     ctrl.thrusterPower[6] * thrusterDirections[6]);
+	m_controller.setThruster(thrusters::vertical_back_right,    ctrl.thrusterPower[7] * thrusterDirections[7]);
 	
 /*	Logger::info(
 		"0-HFL:	" + (String) ctrl.thrusterPower[0] + "	1-HFR:	" + (String) ctrl.thrusterPower[1] + "\n\r"

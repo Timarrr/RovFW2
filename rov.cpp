@@ -121,7 +121,7 @@ void Rov::loop(){
             networking->writeRovTelemetry(*tele);        
         }
     }
-    thrusters->update_thrusters(*control);
+    thrusters->update(*control);
 #if PROFILE>0
     long long micros_nt = micros();
 #endif

@@ -165,6 +165,10 @@ namespace config {
          * 
          */
         constexpr int pins[10] = {3,9,8,7,2,6,4,5};
+        /*!
+         * \brief Thruster directions. Thrusters' values are multiplied by these in Thrusters::update
+         */
+        constexpr static short thrusterDirections[10] = {1,-1,-1,1,-1,1,-1,1,1,1};
 
     }
 

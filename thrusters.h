@@ -35,7 +35,7 @@ public:
      * 
      * @param ctrl Referencr to RovControl object
      */
-    void update_thrusters(RovControl & ctrl);
+    void update(RovControl & ctrl);
 private:
     /**
     * @brief ISRController object
