@@ -105,6 +105,11 @@ class Rov{
          */
         RovAuxControl *auxControl;
 
+        /**
+         * @brief 
+         * 
+         */
+        RovRegulators *regulators;
 };
 
 #endif

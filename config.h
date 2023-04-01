@@ -218,6 +218,20 @@ namespace config {
         constexpr launchConfig currentConfig = launchConfig(fast | forceNoDepth);
     }
 
+    /**
+     * @brief Regulators' coeffs
+     * 
+     */
+    namespace regulators {
+        constexpr int depth_p = 1;
+        constexpr int depth_d = 1;
+        constexpr int yaw_p = 1;
+        constexpr int yaw_d = 1;
+        constexpr int roll_p = 1;
+        constexpr int roll_d = 1;
+        constexpr int pitch_p = 1;
+        constexpr int pitch_d = 1;
+    }
 }
 
 #endif

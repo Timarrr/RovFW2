@@ -7,18 +7,20 @@
 #include "config.h"
 #include "isrcontroller.h"
 #include "logger.h"
+#include "rovdatatypes.h"
 #define THRUSTER_TEST_WAIT_TIME 100
 #define THRUSTER_POWER_COEFF 0.3f
 
-Thrusters::Thrusters(bool launch, bool test, long &init_ms_remaining){
+Thrusters::Thrusters(bool launch, bool test, long &init_ms_begin){
     if (!launch){
         Logger::info(F("Thrusters init cancelled"));
         return;
     }
-    Logger::info(F("Waiting for thrusters init..."));
-    delay(8000);
-    Logger::info(F("  Done!"));
+
     if (test){
+        Logger::info(F("Waiting for thrusters init..."));
+        delay(8000);
+        Logger::info(F("  Done!"));
         Logger::info(F("Testing thrusters:"));
         for (int i = 0; i < 4; i++) {
             Logger::info("Set thruster pair " + String(i) + " to -100");
@@ -38,6 +40,10 @@ Thrusters::Thrusters(bool launch, bool test, long &init_ms_remaining){
             m_controller.setThruster(i+1, 0);
             delay(THRUSTER_TEST_WAIT_TIME);
         }
+    }
+    else {
+        init_ms_begin = millis();
+        return;
     }
 }
 

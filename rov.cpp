@@ -46,33 +46,35 @@ Rov::Rov() : control(new RovControl), tele(new RovTelemetry){
 
     launchConfig curConf = currentConfig;
 
-    switch (curConf) {
-        case fast: //launch everything, test nothing
-            Logger::info(F("Fast startup selected"));
-            break;
-        case full: //launch and test everything 
-            Logger::info(F("Full startup selected"));
-            break;
-        case forceDepth: //don't launch anything except for depth sensor
-            Logger::info(F("Standalone startup with forced depth sensor init selected"));
-            break;
-        case forceEthernet: //don't launch anything except for ethernet
-            Logger::info(F("Standalone startup with forced networking init selected"));
-            break;
-        case standalone: //don't launch anything  
-            Logger::info(F("Standalone startup selected"));
-            break;
-        default:
-            Logger::info(F("Unknown launch value"));
-            // while (true);        
-    }
-    long init_ms_remaining = 0;
-    thrusters = new Thrusters(curConf & (full | fast), curConf & full, init_ms_remaining);
-    networking = new Networking(curConf & initEthernet, curConf & (full | forceEthernet));
-    sensors = new Sensors(curConf & (full | fast), curConf & full, (curConf & initDepth) && !(curConf & forceNoDepth));
-    imu = new IMUSensor(curConf & (full | fast), curConf & full);
+    // switch (curConf) {
+    //     case fast: //launch everything, test nothing
+    //         Logger::info(F("Fast startup selected"));
+    //         break;
+    //     case full: //launch and test everything 
+    //         Logger::info(F("Full startup selected"));
+    //         break;
+    //     case forceDepth: //don't launch anything except for depth sensor
+    //         Logger::info(F("Standalone startup with forced depth sensor init selected"));
+    //         break;
+    //     case forceEthernet: //don't launch anything except for ethernet
+    //         Logger::info(F("Standalone startup with forced networking init selected"));
+    //         break;
+    //     case standalone: //don't launch anything  
+    //         Logger::info(F("Standalone startup selected"));
+    //         break;
+    //     default:
+    //         Logger::info(F("Unknown launch value"));
+    //         // while (true);        
+    // }
+    long init_ms_begin = 0;
+    thrusters = new Thrusters(curConf & (full | fast), curConf & full, init_ms_begin);
     cameras = new Cameras(curConf & (full | fast), curConf & full);
+    imu = new IMUSensor(curConf & (full | fast), curConf & full);
     manipulator = new Manipulator(curConf & (full | fast), curConf & full);
+    networking = new Networking(curConf & initEthernet, curConf & (full | forceEthernet));
+    regulators = new RovRegulators();
+    sensors = new Sensors(curConf & (full | fast), curConf & full, (curConf & initDepth) && !(curConf & forceNoDepth));
+    delay(7000- (millis() - init_ms_begin));
 }
 
 void Rov::serialHandler(){
@@ -121,6 +123,7 @@ void Rov::loop(){
             networking->writeRovTelemetry(*tele);        
         }
     }
+    regulators->evaluate(*control, *auxControl, *tele);
     thrusters->update(*control);
 #if PROFILE>0
     long long micros_nt = micros();

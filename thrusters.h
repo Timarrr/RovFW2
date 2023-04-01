@@ -11,9 +11,10 @@
 #ifndef THRUSTERS_H
 #define THRUSTERS_H
 #include <Arduino.h>
+#include "api/Common.h"
 #include "rovdatatypes.h"
 #include "isrcontroller.h"
-
+#include "regulators.h"
 
 /**
  * @brief Class responsible for controlling the thrusters subsystem
@@ -35,13 +36,13 @@ public:
      * 
      * @param ctrl Referencr to RovControl object
      */
-    void update(RovControl & ctrl);
+    void update(RovControl &ctrl);
 private:
     /**
     * @brief ISRController object
     * @see ISRController
     */
     ISRController m_controller;
-};
 
+};
 #endif

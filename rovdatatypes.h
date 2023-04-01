@@ -58,7 +58,38 @@ struct RovAuxControl
     /*!
      * \brief Auxilary flags, used to control the regulators, and possibly something else
      */
-    int8_t auxFlags = 0b00000000;
+    union _auxFlags{
+        /*!
+         * \brief Raw flags of the union
+         */
+        int8_t rawFlags = 0b00000000;
+        struct {
+            /*!
+             * \brief Depth regulator flag
+             */
+            int8_t eDepth:1;
+
+            /*!
+             * \brief Yaw regulator flag
+             */
+            int8_t eYaw  :1;
+
+            /*!
+             * \brief Roll regulator flag
+             */
+            int8_t eRoll :1;
+
+            /*!
+             * \brief Pitch regulator flag
+             */
+            int8_t ePitch:1;
+
+            /*!
+             * \brief Reserved
+             */
+            int8_t __res :4;
+        };
+    } auxFlags;
     /*!
      * \brief Desired depth
      */
@@ -114,7 +145,7 @@ struct RovTelemetry
      * \brief Version of the protocol used by the RovUI and ROV to communicate
      * \todo Implement handshake protocol
      */
-    int8_t version = 2;
+    uint8_t version = 2;
     /*!
      * \brief Depth data from the ROV
      */
@@ -158,4 +189,5 @@ struct RovTelemetry
     float temperature = 0.0f;
     RovTelemetry() {}
 };
+
 #endif // ROVDATATYPES_H
