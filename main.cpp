@@ -5,13 +5,11 @@
 
 Rov *rov;
 
-void setup(){	
+void setup() {
     analogWrite(LED_BUILTIN, 255);
     rov = new Rov();
 }
 
-void loop(){
-    rov->loop();
-}
+void loop() { rov->loop(); }
 
 #endif

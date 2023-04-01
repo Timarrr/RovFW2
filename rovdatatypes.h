@@ -7,12 +7,13 @@
 #include <cstdint>
 
 /*!
- * \brief The RovControl struct is used for ordering of the data used by RovUI to control the ROV
+ * \brief The RovControl struct is used for ordering of the data used by RovUI
+ * to control the ROV
  */
-struct RovControl
-{
+struct RovControl {
     /*!
-     * \brief Header of the packet, used for distinguishing it from other types of packets
+     * \brief Header of the packet, used for distinguishing it from other types
+     * of packets
      */
     const static int8_t header = 0xAC;
     /*!
@@ -23,11 +24,12 @@ struct RovControl
     /*!
      * \brief Thrusters power to be set on the ROV
      */
-    int8_t thrusterPower[10] = {0,0,0,0,0,0,0,0,0,0};
+    int8_t thrusterPower[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     /*!
-     * \brief Pending camera rotation (<0 is down, >0 is up): 1st is for the front camera, 2nd is for the rear one
+     * \brief Pending camera rotation (<0 is down, >0 is up): 1st is for the
+     * front camera, 2nd is for the rear one
      */
-    int8_t cameraRotationDelta[2] = {0,0};
+    int8_t cameraRotationDelta[2] = {0, 0};
     /*!
      * \brief Pending manipulator action (<0 is open, >0 is close)
      */
@@ -37,28 +39,31 @@ struct RovControl
      */
     int8_t manipulatorRotate = 0;
     /*!
-     * \brief Camera select variable (false is front camera, true is back camera)
+     * \brief Camera select variable (false is front camera, true is back
+     * camera)
      */
     int8_t camsel = false;
     /*!
      * \brief Default constructor
      */
-    RovControl(){}
+    RovControl() {}
 };
 
 /*!
- * \brief The RovAuxControl struct is used for controlling the auxiliary data used by RovUI to control the ROV
+ * \brief The RovAuxControl struct is used for controlling the auxiliary data
+ * used by RovUI to control the ROV
  */
-struct RovAuxControl
-{
+struct RovAuxControl {
     /*!
-     * \brief Header of the packet, used for distinguishing it from other types of packets
+     * \brief Header of the packet, used for distinguishing it from other types
+     * of packets
      */
     const static int8_t header = 0xAD;
     /*!
-     * \brief Auxilary flags, used to control the regulators, and possibly something else
+     * \brief Auxilary flags, used to control the regulators, and possibly
+     * something else
      */
-    union _auxFlags{
+    union _auxFlags {
         /*!
          * \brief Raw flags of the union
          */
@@ -67,27 +72,27 @@ struct RovAuxControl
             /*!
              * \brief Depth regulator flag
              */
-            int8_t eDepth:1;
+            int8_t eDepth : 1;
 
             /*!
              * \brief Yaw regulator flag
              */
-            int8_t eYaw  :1;
+            int8_t eYaw : 1;
 
             /*!
              * \brief Roll regulator flag
              */
-            int8_t eRoll :1;
+            int8_t eRoll : 1;
 
             /*!
              * \brief Pitch regulator flag
              */
-            int8_t ePitch:1;
+            int8_t ePitch : 1;
 
             /*!
              * \brief Reserved
              */
-            int8_t __res :4;
+            int8_t __res : 4;
         };
     } auxFlags;
     /*!
@@ -113,12 +118,13 @@ struct RovAuxControl
 };
 
 /*!
- * \brief The RovHeartBeat struct is used for ordering of the data with the heartbeat signals coming from the ROV
+ * \brief The RovHeartBeat struct is used for ordering of the data with the
+ * heartbeat signals coming from the ROV
  */
-struct RovHeartBeat
-{
+struct RovHeartBeat {
     /*!
-     * \brief Header of the packet, used for distinguishing it from other types of packets
+     * \brief Header of the packet, used for distinguishing it from other types
+     * of packets
      */
     const static int8_t header = 0xAF;
 
@@ -133,12 +139,13 @@ struct RovHeartBeat
 };
 
 /*!
- * \brief The RovTelemetry struct is used for ordering of the data with the telemetry coming from the ROV
+ * \brief The RovTelemetry struct is used for ordering of the data with the
+ * telemetry coming from the ROV
  */
-struct RovTelemetry
-{
+struct RovTelemetry {
     /*!
-     * \brief Header of the packet, used for distinguishing it from other types of packets
+     * \brief Header of the packet, used for distinguishing it from other types
+     * of packets
      */
     const static int8_t header = 0xAE;
     /*!
