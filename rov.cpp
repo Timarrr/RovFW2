@@ -109,7 +109,7 @@ void Rov::loop() {
     serialHandler();
     sensors->update();
     imu->update();
-#if PROFILE > 0
+#if PROFILE
     long long micros_s = micros();
 #endif
     tele->yaw = imu->getYaw();

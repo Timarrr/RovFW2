@@ -15,6 +15,16 @@ int PDRegulator::eval(int data, int target) {
     return u;
 }
 
+float FPPDRegulator::eval(float data, float target) {
+    float err = target - data;
+    float u =
+        kP * (err + kD * ((lastError - err) /
+                          (lastTime - millis()))); // kP(error + kD(dError/dt))
+    lastError = err;
+    lastTime = millis();
+    return u;
+}
+
 RovRegulators::RovRegulators()
     : depthReg(config::regulators::depth_p, config::regulators::depth_d),
       yawReg(config::regulators::yaw_p, config::regulators::yaw_d),

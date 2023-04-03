@@ -15,7 +15,15 @@
 #include <Wire.h>
 #include <cstddef>
 
-void loop();
+/**
+ * @brief uhhh, don't you know this?
+ *
+ */
 void setup();
+/**
+ * @brief uhhh, don't you know this?
+ *
+ */
+void loop();
 
 #endif
