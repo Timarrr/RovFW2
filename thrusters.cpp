@@ -46,7 +46,7 @@ Thrusters::Thrusters(bool launch, bool test, long &init_ms_begin) {
     }
 }
 
-void Thrusters::update(RovControl &ctrl) {
+void Thrusters::update(RovControl ctrl) {
     using namespace config::thrusters;
 
     m_controller.setThruster(thrusters::horizontal_front_left,

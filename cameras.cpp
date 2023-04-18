@@ -8,12 +8,12 @@
 #include <cctype>
 
 Cameras::Cameras(bool launch, bool test) {
-    Logger::info(F("Rotary cameras init"));
+    Logger::info(F("Rotary cameras init\n\r"));
     pinMode(config::cameras::multiplexer_pin, OUTPUT);
     m_backServo.attach(config::cameras::back);
     m_frontServo.attach(config::cameras::front);
     if (test) {
-        Logger::info(F("Testing cameras rotation"));
+        Logger::info(F("Testing cameras rotation\n\r"));
         for (byte pos = 0; pos <= 180; pos++) {
             m_backServo.write(pos);
             m_frontServo.write(pos);

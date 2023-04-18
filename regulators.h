@@ -8,6 +8,7 @@
  * @copyright Copyright (c) 2023
  *
  */
+#include "api/Common.h"
 #include "rovdatatypes.h"
 #include "samd21/include/component/mtb.h"
 #include <Arduino.h>
@@ -73,7 +74,7 @@ class FPPDRegulator {
      * @param coeffD Differential coefficient
      */
     FPPDRegulator(float coeffP, float coeffD)
-        : kP(coeffP), kD(coeffD), lastError(0.0f), lastTime(0){};
+        : kP(coeffP), kD(coeffD), lastError(0.0f), lastTime(millis()){};
     /**
      * @brief Evaluate the regulator expression
      *
@@ -82,6 +83,7 @@ class FPPDRegulator {
      * @return float Control signal
      */
     float eval(float data, float target);
+    void reset();
 
   private:
     float kP;
@@ -90,6 +92,9 @@ class FPPDRegulator {
 
     float lastError;
 
+    int offset;
+
+    int lastData;
     uint32_t lastTime;
 };
 
@@ -111,30 +116,33 @@ class RovRegulators {
      * @param auxCtrl
      * @param tele
      */
-    void evaluate(RovControl &ctrl, RovAuxControl &auxCtrl, RovTelemetry &tele);
+    RovControl evaluate(RovControl ctrl, RovAuxControl &auxCtrl, RovTelemetry &tele);
 
   private:
     /**
-     * @brief Depth regulators
+     * @brief Depth regulator
      *
      */
-    PDRegulator depthReg;
+    FPPDRegulator rDepth;
 
     /**
      * @brief Yaw regulator
      *
      */
-    PDRegulator yawReg;
+    FPPDRegulator rYaw;
 
     /**
      * @brief Roll regulator
      *
      */
-    PDRegulator rollReg;
+    FPPDRegulator rRoll;
 
     /**
      * @brief Pitch regulator
      *
      */
-    PDRegulator pitchReg;
+    FPPDRegulator rPitch;
+
+
+    int16_t uD, uY, uR, uP;
 };

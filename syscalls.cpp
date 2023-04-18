@@ -5,30 +5,35 @@
 #include "syscalls.h"
 
 extern "C" {
-int _close(int _) { return -1; }
+int _close(int _) { SerialUSB.println("_close() called with " + String(_)); return -1; }
 
-int _getpid() { return 1; }
+int _getpid() { SerialUSB.println("_getpid() called"); return 1; }
 
-int _isatty() { return -1; }
+int _isatty() { SerialUSB.println("_isatty() called"); return -1; }
 
-int _fstat(int _) { return -1; }
+int _fstat(int _) {return 0; }
 
-int _kill(int _, int __) { return -1; }
+int _kill(int _, int __) { SerialUSB.println("_kill() called with " + String(_) + ";" +String(__)); return -1; }
 
-int _lseek(int _) { return -1; }
+int _lseek(int _) { SerialUSB.println("_lseek() called with " + String(_)); return -1; }
 
 int _write(int fd, const char *buf, int len) {
     if (fd == 1 || fd == 2) {
-        SerialUSB.write(buf, len);
-        return 0;
+        SerialUSB.println(String(len) + "   " + String(SerialUSB.availableForWrite()));
+        SerialUSB.flush();
+        SerialUSB.write(buf);
+        SerialUSB.flush();
+        // return 0;
     } else
         return -1;
 }
 
 int _read(int fd, char *buf, size_t count) {
-    if (fd == 0) {
+    SerialUSB.println("_read() called with fd " + String(fd));
+
+    if (fd == 0 && SerialUSB.available()) {
         return SerialUSB.readBytes(buf, count);
     } else
-        return -1;
+        return 0;
 }
 }

@@ -51,7 +51,7 @@ class Networking {
      *
      * @param tele Telemetry
      */
-    void writeRovTelemetry(RovTelemetry tele);
+    void writeRovTelemetry(RovTelemetry &tele);
 
     /**
      * @brief Get physical link status

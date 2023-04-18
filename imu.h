@@ -79,7 +79,7 @@ class IMUSensor {
     float Euler[3] = {0.0, 0.0, 0.0};
     void imuCrc16Update(uint16_t *currentCrc, const uint8_t *src,
                         uint32_t lengthInBytes);
-    uint32_t imuPacketDecode(uint8_t c);
+    void imuPacketDecode(uint8_t c);
     void imuUpdateEuler(IMUHelpers::Packet_t *pkt);
 };
 

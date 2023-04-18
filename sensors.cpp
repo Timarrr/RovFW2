@@ -39,12 +39,12 @@ void Sensors::update() {
             m_depthSensor.read();
             m_lastDepthUpdateMs = millis();
 
-            if (abs(m_depthSensor.depth()) < 150) {
+            if (m_depthSensor.depth() < 150.0 || m_depthSensor.depth() > -150.0) {
                 m_depth = m_depthSensor.depth();
                 m_temp = m_depthSensor.temperature();
             } else { // don't accept value if value is too big (probably
                      // corrupted data)
-                Logger::warn(F("Depth sensor read error. Retrying init"));
+                Logger::warn(F("Depth sensor read error. Retrying init\n\r"));
 
                 // trying to reset I2C and init sensor again.
                 Wire.end();

@@ -48,9 +48,8 @@ namespace helpers {
     }
 
     /**
-     * @brief Swaps bytes from native LSF to MSF
-     * @todo Research into this and maybe change the endianness
-     *
+     * @brief Swaps bytes of multi-byte data
+     * @todo Research into this and deprecate this shit
      * @tparam T Type
      * @param u Value to swap endianness in which
      * @return T Value with swapped endianness
@@ -69,6 +68,10 @@ namespace helpers {
 
         // Logger::trace(String(dest.u, 10));
         return dest.u;
+    }
+
+    template <typename T> inline T clamp(T val, T min, T max) {
+        return val > max ? max : val < min ? min : val;
     }
 
     // template <typename T>

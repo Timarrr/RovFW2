@@ -33,7 +33,7 @@ namespace config {
          * @brief ROV's port
          *
          */
-        constexpr PROGMEM uint16_t rovPort = 3010;
+        constexpr PROGMEM uint16_t rovPort = 46175;
 
         /**
          * @brief RC's IP address in an array
@@ -45,7 +45,7 @@ namespace config {
          * @brief RC's port
          *
          */
-        constexpr PROGMEM uint16_t rcPort = 3010;
+        constexpr PROGMEM uint16_t rcPort = 46176;
 
         /**
          * @brief CS pin for the W5xxx network controller
@@ -203,13 +203,15 @@ namespace config {
          * @todo Explain how this works
          */
         enum launchConfig {
-            full = 0b10000000,
-            fast = 0b01000000,
-            standalone = 0b00000001,
-            forceEthernet = 0b00000010,
-            forceNoEthernet = 0b00000100,
-            forceDepth = 0b00001000,
-            forceNoDepth = 0b00010000,
+            // clang-format off
+            full =              0b0000000000000001,
+            fast =              0b0000000000000010,
+            standalone =        0b1000000000000000,
+            forceEthernet =     0b0100000000000000,
+            forceNoEthernet =   0b0010000000000000,
+            forceDepth =        0b0001000000000000,
+            forceNoDepth =      0b0000100000000000,
+            // clang-format on
             initEthernet = full | fast | forceEthernet,
             initDepth = full | fast | forceDepth
         };
@@ -218,8 +220,7 @@ namespace config {
          * @brief Current selected configuration loadout
          *
          */
-        constexpr launchConfig currentConfig =
-            launchConfig(fast | forceNoDepth);
+        constexpr launchConfig currentConfig = launchConfig(fast);
     } // namespace launchConfig
 
     /**
@@ -231,13 +232,13 @@ namespace config {
          * @brief Depth regulator proportional coefficient
          *
          */
-        constexpr PROGMEM float depth_p = 1;
+        constexpr PROGMEM float depth_p = 200;
 
         /**
          * @brief Depth regulator differential coefficient
          *
          */
-        constexpr PROGMEM float depth_d = 1;
+        constexpr PROGMEM float depth_d = 10000;
 
         /**
          * @brief Yaw regulator proportional coefficient
@@ -249,7 +250,7 @@ namespace config {
          * @brief Yaw regulator differential coefficient
          *
          */
-        constexpr PROGMEM float yaw_d = 1;
+        constexpr PROGMEM float yaw_d = 100;
 
         /**
          * @brief Roll regulator proportional coefficient

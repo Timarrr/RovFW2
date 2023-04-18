@@ -1,9 +1,11 @@
 #ifndef ROV_CPP
 #define ROV_CPP
 #include "rov.h"
+#include "USB/USBAPI.h"
 #include "api/Common.h"
 #include "config.h"
 #include "logger.h"
+#include "rovdatatypes.h"
 #include <cstdint>
 
 #define PROFILE 0
@@ -12,12 +14,12 @@
 #define PROFILE_PIN A2
 
 extern "C" char *sbrk(int incr);
-// int freeMemory() {
-//   char top;
-//   return &top - reinterpret_cast<char*>(sbrk(0));
-// }
+int freeMemory() {
+  char top;
+  return &top - reinterpret_cast<char*>(sbrk(0));
+}
 
-Rov::Rov() : control(new RovControl), tele(new RovTelemetry) {
+Rov::Rov() : tele(new RovTelemetry), control(new RovControl), rawControl(new RovControl), auxControl(new RovAuxControl) {
     using namespace config::launchConfig;
     Wire.begin();
     Wire.setTimeout(1000);
@@ -41,8 +43,8 @@ Rov::Rov() : control(new RovControl), tele(new RovTelemetry) {
         }
         delay(200);
     }
-
-    Logger::info(F("HighROV init!"));
+    digitalWrite(LED_BUILTIN, 0);
+    Logger::info(F("HighROV init!\n\r"));
 
     launchConfig curConf = currentConfig;
 
@@ -77,7 +79,9 @@ Rov::Rov() : control(new RovControl), tele(new RovTelemetry) {
     regulators = new RovRegulators();
     sensors = new Sensors(curConf & (full | fast), curConf & full,
                           (curConf & initDepth) && !(curConf & forceNoDepth));
-    delay(7000 - (millis() - init_ms_begin));
+    debug = new Debug(tele, control, auxControl);
+    Logger::debug("Waiting for " + String(9000 - (millis() - init_ms_begin)) + "ms\n\r");
+    delay(9000 - (millis() - init_ms_begin));
 }
 
 void Rov::serialHandler() {
@@ -87,14 +91,13 @@ void Rov::serialHandler() {
         if (msg == "reset") {
             Logger::info(F(
                 "Resetting the controller, please reconnect the debug cable or "
-                "reactivate serial monitor if you want to continue debugging"));
+                "reactivate serial monitor if you want to continue debugging\n\r"));
             SerialUSB.end();
             sensors->end();
             imu->end();
             NVIC_SystemReset();
         } else if (msg == "debug")
-            asm("nop");
-        // Debug::debugMenu();
+            asm("nop"); //TODO: implement debug menu
         else
             Logger::info(
                 F("send \"reset\" for controller reset or \"debug\" for "
@@ -109,6 +112,7 @@ void Rov::loop() {
     serialHandler();
     sensors->update();
     imu->update();
+    
 #if PROFILE
     long long micros_s = micros();
 #endif
@@ -120,7 +124,6 @@ void Rov::loop() {
     tele->current = sensors->getCurrent();
     tele->voltage = sensors->getVoltage();
     tele->cameraIndex = control->camsel;
-
     if (config::launchConfig::currentConfig &
         (config::launchConfig::fast | config::launchConfig::full |
          config::launchConfig::forceEthernet)) {
@@ -130,8 +133,7 @@ void Rov::loop() {
             networking->writeRovTelemetry(*tele);
         }
     }
-    regulators->evaluate(*control, *auxControl, *tele);
-    thrusters->update(*control);
+    thrusters->update(regulators->evaluate(*control, *auxControl, *tele));
 #if PROFILE > 0
     long long micros_nt = micros();
 #endif
@@ -143,7 +145,7 @@ void Rov::loop() {
     manipulator->setOpenClose(control->manipulatorOpenClose);
     manipulator->setRotate(control->manipulatorRotate);
 
-    // analogWrite(LED_BUILTIN, sin(micros() * 0.00001) * 127 + 127);
+    analogWrite(LED_BUILTIN, uint8_t(millis()) % 255);
 #if PROFILE > 0
     // Logger::trace("s: " + String(uint16_t(micros_s - micros_p)) + ";\t\ts to
     // nt: " + String(uint16_t(micros_nt - micros_s)) + ";\t\tnt to end: " +
@@ -151,6 +153,8 @@ void Rov::loop() {
     // String(uint16_t(micros() - micros_p)));
 #endif
     // Logger::trace(String(10000 - (micros() - micros_p)));
+    // debug->debugHandler();
+    Logger::debug(String(freeMemory()) + "\n");
     int del = 7500 - (micros() - micros_p);
     delayMicroseconds(del > 0 ? del : 1);
 #if PROFILE_OSCILLOGRAPH

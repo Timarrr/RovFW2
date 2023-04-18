@@ -7,61 +7,61 @@
 namespace Logger {
     void trace(const __FlashStringHelper *string, bool decorator) {
         if (decorator)
-            printf(trace_decorator);
-        printf((const char *)string);
+            SerialUSB.print(trace_decorator);
+        SerialUSB.print((const char *)string);
     }
     void trace(String string, bool decorator) {
         if (decorator)
-            printf(trace_decorator);
-        printf(string.c_str());
+            SerialUSB.print(trace_decorator);
+        SerialUSB.print(string.c_str());
     }
 
     void debug(const __FlashStringHelper *string, bool decorator) {
         if (decorator)
-            printf(debug_decorator);
-        printf((const char *)string);
+            SerialUSB.print(debug_decorator);
+        SerialUSB.print((const char *)string);
     }
 
     void debug(String string, bool decorator) {
         if (decorator)
-            printf(debug_decorator);
-        printf(string.c_str());
+            SerialUSB.print(debug_decorator);
+        SerialUSB.print(string.c_str());
     }
 
     void info(const __FlashStringHelper *string, bool decorator) {
         if (decorator)
-            printf(info_decorator);
-        printf((const char *)string);
+            SerialUSB.print(info_decorator);
+        SerialUSB.print((const char *)string);
     }
 
     void info(String string, bool decorator) {
         if (decorator)
-            printf(info_decorator);
-        printf(string.c_str());
+            SerialUSB.print(info_decorator);
+        SerialUSB.print(string.c_str());
     }
 
     void warn(const __FlashStringHelper *string, bool decorator) {
         if (decorator)
-            printf(warn_decorator);
-        printf((const char *)string);
+            SerialUSB.print(warn_decorator);
+        SerialUSB.print((const char *)string);
     }
 
     void warn(String string, bool decorator) {
         if (decorator)
-            printf(warn_decorator);
-        printf(string.c_str());
+            SerialUSB.print(warn_decorator);
+        SerialUSB.print(string.c_str());
     }
 
     void error(const __FlashStringHelper *string, bool decorator) {
         if (decorator)
-            printf(error_decorator);
-        printf((const char *)string);
+            SerialUSB.print(error_decorator);
+        SerialUSB.print((const char *)string);
     }
 
     void error(String string, bool decorator) {
         if (decorator)
-            printf(error_decorator);
-        printf(string.c_str());
+            SerialUSB.print(error_decorator);
+        SerialUSB.print(string.c_str());
     }
 } // namespace Logger
 

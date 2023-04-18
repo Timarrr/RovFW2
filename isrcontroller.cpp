@@ -7,7 +7,7 @@
 ISRController::ISRController() {
     using namespace config::thrusters;
 
-    Logger::debug(F("ISR init"));
+    Logger::debug(F("ISR init\n\r"));
 
     SAMD_ISR_Servos.useTimer(TIMER_TCC);
 

@@ -20,6 +20,7 @@
 #include "rovdatatypes.h"
 #include "sensors.h"
 #include "thrusters.h"
+#include "debug.h"
 
 /**
  * @brief ROV class, responsible for controlling all other classes and,
@@ -101,6 +102,12 @@ class Rov {
     RovControl *control;
 
     /**
+     * @brief Raw control
+     * 
+     */
+    RovControl *rawControl;
+
+    /**
      * @brief RovAuxControl object
      * @see RovAuxControl
      */
@@ -111,6 +118,8 @@ class Rov {
      * @see RovRegulators
      */
     RovRegulators *regulators;
+
+    Debug *debug;
 };
 
 #endif

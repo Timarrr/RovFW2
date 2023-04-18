@@ -12,10 +12,10 @@ Manipulator::Manipulator(bool launch, bool test) : m_pca(new PCA9536()) {
     if (!launch)
         return;
 
-    Logger::info(F("Manipulator init"));
+    Logger::info(F("Manipulator init\n\r"));
     if (m_pca->begin(Wire) == false) {
         Logger::error(F("PCA9536 not detected or failed to init! Check the I2C "
-                        "connection and reset the ROV"));
+                        "connection and reset the ROV\n\r"));
         defunct = true;
         return;
     }

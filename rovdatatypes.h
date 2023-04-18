@@ -58,11 +58,11 @@ struct RovAuxControl {
      * \brief Header of the packet, used for distinguishing it from other types
      * of packets
      */
-    const static int8_t header = 0xAD;
-    /*!
-     * \brief Auxilary flags, used to control the regulators, and possibly
-     * something else
-     */
+    int8_t header = 0xAD;
+    // /*!
+    //  * \brief Auxilary flags, used to control the regulators, and possibly
+    //  * something else
+    //  */
     union _auxFlags {
         /*!
          * \brief Raw flags of the union
@@ -159,7 +159,7 @@ struct RovTelemetry {
     float depth = 0.0f;
     /*!
      * \brief Pitch angle data from the ROV
-     * Valid values are from -180 to 180, in degrees
+     * Valid values are from 0 to 360, in degrees
      * \image html rov_pitch_img.png
      */
     float pitch = 0;
@@ -171,7 +171,7 @@ struct RovTelemetry {
     float yaw = 0;
     /*!
      * \brief Roll angle data from the ROV
-     * Valid values are from -180 to 180, in degrees
+     * Valid values are from 0 to 360, in degrees
      * \image html rov_roll_img.png
      */
     float roll = 0;

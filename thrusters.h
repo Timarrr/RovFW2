@@ -36,9 +36,9 @@ class Thrusters {
     /**
      * @brief Updates thrusters based on RovControl object
      *
-     * @param ctrl Referencr to RovControl object
+     * @param ctrl Pointer to RovControl object
      */
-    void update(RovControl &ctrl);
+    void update(RovControl ctrl);
 
   private:
     /**
