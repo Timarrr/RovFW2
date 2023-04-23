@@ -146,7 +146,8 @@ void IMUSensor::imuUpdateEuler(Packet_t *pkt) {
     }
     if (pkt->buf[23] == kItemAtdE) /* atd E */
     {
-        float val = ((float)(int16_t)(pkt->buf[24] + (pkt->buf[25] << 8))) / 100;
+        float val =
+            ((float)(int16_t)(pkt->buf[24] + (pkt->buf[25] << 8))) / 100;
         if (!isnan(val)) {
             Euler[0] = val;
         }
@@ -171,7 +172,7 @@ void IMUSensor::update() {
 }
 
 void IMUSensor::end() { SerialImu.end(); }
-//axes swap: pitch is roll
+// axes swap: pitch is roll
 float IMUSensor::getPitch() { return Euler[1]; }
 float IMUSensor::getRoll() { return Euler[0] + 180; }
 float IMUSensor::getYaw() { return Euler[2] + 180; }

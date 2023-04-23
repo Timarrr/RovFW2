@@ -11,7 +11,7 @@ Sensors::Sensors(bool launch, bool test, bool ds_init) {
     if (!ds_init)
         return;
 
-    Logger::info(F("Depth sensor init"));
+    Logger::info(F("Depth sensor init\n\r"));
     m_depthSensorEnabled = ds_init;
     m_depthSensor.setModel(MS5837::MS5837_30BA);
     m_depthSensor.setFluidDensity(
@@ -39,7 +39,7 @@ void Sensors::update() {
             m_depthSensor.read();
             m_lastDepthUpdateMs = millis();
 
-            if (m_depthSensor.depth() < 150.0 || m_depthSensor.depth() > -150.0) {
+            if (m_depthSensor.depth() < 150.0f) {
                 m_depth = m_depthSensor.depth();
                 m_temp = m_depthSensor.temperature();
             } else { // don't accept value if value is too big (probably

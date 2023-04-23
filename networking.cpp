@@ -8,6 +8,7 @@
 #include "helpers.h"
 #include "logger.h"
 #include "rovdatatypes.h"
+#include <cstddef>
 #include <cstdint>
 
 EthernetUDP udp = EthernetUDP();
@@ -90,38 +91,41 @@ void Networking::maintain() {
     }
 }
 
-void Networking::readRovControl(RovControl &ctrl, RovAuxControl &auxCtrl) {
+size_t Networking::readRovControl(RovControl &ctrl, RovAuxControl &auxCtrl) {
     uint8_t buffer[32];
-    int size = 0;
-    int i = 0;
-    do{
+    int size = 0, packets = -1;
+    do {
         size = read(buffer, 32);
-        if (size > 0) {
-            size_t i = 0;
-            int8_t header = 0;
-            helpers::read_bytes(buffer, i, header);
-            if (header == ctrl.header) { // yup that's a control message
-                i += 1;                  // skip version
-                helpers::read_bytes(buffer, i, ctrl.thrusterPower);
-                helpers::read_bytes(buffer, i, ctrl.manipulatorOpenClose);
-                helpers::read_bytes(buffer, i, ctrl.manipulatorRotate);
-                helpers::read_bytes(buffer, i, ctrl.cameraRotationDelta[0]);
-                helpers::read_bytes(buffer, i, ctrl.cameraRotationDelta[1]);
-                helpers::read_bytes(buffer, i, ctrl.camsel);
-            } else if (header ==
-                    auxCtrl.header) { // yup that's an auxControl message
-                helpers::read_bytes(buffer, i, auxCtrl.auxFlags.rawFlags);
-                helpers::read_bytes(buffer, i, auxCtrl.dDepth);
-                auxCtrl.dDepth = helpers::swapEndian(auxCtrl.dDepth);
-                helpers::read_bytes(buffer, i, auxCtrl.dYaw);
-                auxCtrl.dYaw = helpers::swapEndian(auxCtrl.dYaw);
-                helpers::read_bytes(buffer, i, auxCtrl.dRoll);
-                auxCtrl.dRoll = helpers::swapEndian(auxCtrl.dRoll);
-                helpers::read_bytes(buffer, i, auxCtrl.dPitch);
-                auxCtrl.dPitch = helpers::swapEndian(auxCtrl.dPitch);
-            }
+        size_t data_counter = 0;
+        int8_t header = 0;
+        helpers::read_bytes(buffer, data_counter, header);
+        if (header == ctrl.header) { // yup that's a control message
+            data_counter += 1;       // skip version
+            helpers::read_bytes(buffer, data_counter, ctrl.thrusterPower);
+            helpers::read_bytes(buffer, data_counter,
+                                ctrl.manipulatorOpenClose);
+            helpers::read_bytes(buffer, data_counter, ctrl.manipulatorRotate);
+            helpers::read_bytes(buffer, data_counter,
+                                ctrl.cameraRotationDelta[0]);
+            helpers::read_bytes(buffer, data_counter,
+                                ctrl.cameraRotationDelta[1]);
+            helpers::read_bytes(buffer, data_counter, ctrl.camsel);
+        } else if (header ==
+                   auxCtrl.header) { // yup that's an auxControl message
+            helpers::read_bytes(buffer, data_counter,
+                                auxCtrl.auxFlags.rawFlags);
+            helpers::read_bytes(buffer, data_counter, auxCtrl.dDepth);
+            auxCtrl.dDepth = helpers::swapEndian(auxCtrl.dDepth);
+            helpers::read_bytes(buffer, data_counter, auxCtrl.dYaw);
+            auxCtrl.dYaw = helpers::swapEndian(auxCtrl.dYaw);
+            helpers::read_bytes(buffer, data_counter, auxCtrl.dRoll);
+            auxCtrl.dRoll = helpers::swapEndian(auxCtrl.dRoll);
+            helpers::read_bytes(buffer, data_counter, auxCtrl.dPitch);
+            auxCtrl.dPitch = helpers::swapEndian(auxCtrl.dPitch);
         }
-    } while (size>0);
+        packets++;
+    } while (size > 0);
+    return packets;
 }
 
 void Networking::writeRovTelemetry(RovTelemetry &tele) {

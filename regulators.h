@@ -116,7 +116,8 @@ class RovRegulators {
      * @param auxCtrl
      * @param tele
      */
-    RovControl evaluate(RovControl ctrl, RovAuxControl &auxCtrl, RovTelemetry &tele);
+    RovControl evaluate(RovControl ctrl, RovAuxControl &auxCtrl,
+                        RovTelemetry &tele);
 
   private:
     /**
@@ -142,7 +143,6 @@ class RovRegulators {
      *
      */
     FPPDRegulator rPitch;
-
 
     int16_t uD, uY, uR, uP;
 };

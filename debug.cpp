@@ -41,7 +41,7 @@ void Debug::debugHandler() {
                       " Rear: " + String(ctrl->cameraRotationDelta[1]) +
                       " CamSel: " + String(ctrl->camsel));
     }
-    if(flags.regulators) {
+    if (flags.regulators) {
         Logger::debug("Regulators debug not implemented!");
         flags.regulators = 0;
     }

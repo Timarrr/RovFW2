@@ -16,6 +16,7 @@
 #include "rovdatatypes.h"
 #include <Arduino.h>
 #include <Ethernet.h>
+#include <cstddef>
 
 /**
  * @brief Class responsible for communication with RC
@@ -44,7 +45,7 @@ class Networking {
      * @param ctrl Reference to RovControl object
      * @param auxCtrl Reference to RovAuxControl object
      */
-    void readRovControl(RovControl &ctrl, RovAuxControl &auxCtrl);
+    size_t readRovControl(RovControl &ctrl, RovAuxControl &auxCtrl);
 
     /**
      * @brief Writes RovTelemetry to the UDP socket

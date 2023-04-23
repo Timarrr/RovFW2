@@ -12,6 +12,7 @@
 #define ROV_H
 #include "cameras.h"
 #include "config.h"
+#include "debug.h"
 #include "imu.h"
 #include "isrcontroller.h"
 #include "main.h"
@@ -20,7 +21,6 @@
 #include "rovdatatypes.h"
 #include "sensors.h"
 #include "thrusters.h"
-#include "debug.h"
 
 /**
  * @brief ROV class, responsible for controlling all other classes and,
@@ -103,7 +103,7 @@ class Rov {
 
     /**
      * @brief Raw control
-     * 
+     *
      */
     RovControl *rawControl;
 

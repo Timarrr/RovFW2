@@ -55,8 +55,9 @@ RovRegulators::RovRegulators()
 
 RovControl RovRegulators::evaluate(RovControl ctrl, RovAuxControl &auxCtrl,
                                    RovTelemetry &tele) {
-    if (auxCtrl.auxFlags
-            .eDepth && tele.depth != MAXFLOAT) { // If depth reg is enabled, evaluate its control signal
+    if (auxCtrl.auxFlags.eDepth &&
+        tele.depth !=
+            MAXFLOAT) { // If depth reg is enabled, evaluate its control signal
         uD = rDepth.eval(tele.depth, auxCtrl.dDepth);
     } else {
         rDepth.reset(); // Else reset everything in depth regulator
@@ -96,9 +97,17 @@ RovControl RovRegulators::evaluate(RovControl ctrl, RovAuxControl &auxCtrl,
     //               " [2]: " + String(ctrl.thrusterPower[2], 10) +
     //               " [3]: " + String(ctrl.thrusterPower[3], 10) +
     //               "\n\r"); // Vertical thrusters
-    ctrl.thrusterPower[4] = helpers::clamp(-int16_t(uD) - int16_t(uP) + int16_t(uR) + ctrl.thrusterPower[4], -128, 127);
-    ctrl.thrusterPower[5] = helpers::clamp(-int16_t(uD) - int16_t(uP) - int16_t(uR) + ctrl.thrusterPower[5], -128, 127);
-    ctrl.thrusterPower[6] = helpers::clamp(-int16_t(uD) + int16_t(uP) + int16_t(uR) + ctrl.thrusterPower[6], -128, 127);
-    ctrl.thrusterPower[7] = helpers::clamp(-int16_t(uD) + int16_t(uP) - int16_t(uR) + ctrl.thrusterPower[7], -128, 127);
+    ctrl.thrusterPower[4] = helpers::clamp(
+        -int16_t(uD) - int16_t(uP) + int16_t(uR) + ctrl.thrusterPower[4], -128,
+        127);
+    ctrl.thrusterPower[5] = helpers::clamp(
+        -int16_t(uD) - int16_t(uP) - int16_t(uR) + ctrl.thrusterPower[5], -128,
+        127);
+    ctrl.thrusterPower[6] = helpers::clamp(
+        -int16_t(uD) + int16_t(uP) + int16_t(uR) + ctrl.thrusterPower[6], -128,
+        127);
+    ctrl.thrusterPower[7] = helpers::clamp(
+        -int16_t(uD) + int16_t(uP) - int16_t(uR) + ctrl.thrusterPower[7], -128,
+        127);
     return RovControl(ctrl);
 }
