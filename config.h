@@ -165,7 +165,7 @@ namespace config {
          *
          */
         constexpr PROGMEM pin_size_t pins[10] = {3, 9, 8, 7, 2, 6, 4, 5};
-        /*!
+        /**
          * \brief Thruster directions. Thrusters' values are multiplied by these
          * in Thrusters::update
          */

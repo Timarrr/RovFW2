@@ -13,6 +13,10 @@ class MS5837Atomic{
 
     void loop();
 
+	float depth(){return (P*10-101300)/(fluidDensity*9.80665);};
+
+	int32_t temperature(){return TEMP;};
+
 
     private:
     uint16_t C[8];

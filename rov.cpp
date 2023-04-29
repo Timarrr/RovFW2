@@ -3,15 +3,17 @@
 #include "rov.h"
 #include "USB/USBAPI.h"
 #include "api/Common.h"
+#include "api/Compat.h"
 #include "config.h"
 #include "logger.h"
 #include "rovdatatypes.h"
+#include "variant.h"
 #include <cstdint>
 
 #define PROFILE 0
 
-#define PROFILE_OSCILLOGRAPH 1
-#define PROFILE_PIN A2
+#define PROFILE_OSCILLOGRAPH 0
+#define PROFILE_OSCILLOGRAPH_PIN null
 
 using namespace config::launchConfig;
 
@@ -32,7 +34,7 @@ Rov::Rov()
     unsigned int t_on = millis() + config::serial::waitForSerialTime;
 
     pinMode(LED_BUILTIN, OUTPUT);
-    pinMode(PROFILE_PIN, OUTPUT);
+    pinMode(PROFILE_OSCILLOGRAPH_PIN, OUTPUT);
     analogWrite(LED_BUILTIN, 100);
 
     if (config::serial::waitForSerial) {
@@ -112,7 +114,7 @@ void Rov::serialHandler() {
 void Rov::loop() {
     long long micros_p = micros();
 #if PROFILE_OSCILLOGRAPH
-    digitalWrite(PROFILE_PIN, 0);
+    digitalWrite(PROFILE_OSCILLOGRAPH_PIN, 0);
 #endif
     serialHandler();
     sensors->update();
@@ -151,6 +153,9 @@ void Rov::loop() {
     manipulator->setOpenClose(control->manipulatorOpenClose);
     manipulator->setRotate(control->manipulatorRotate);
 
+    digitalWrite(A2, auxControl->auxFlags.eLight); //enable light
+    digitalWrite(A3, auxControl->auxFlags.ePump); // enable pump
+
     analogWrite(LED_BUILTIN, abs((int16_t(millis() % 512)) - 256));
 #if PROFILE > 0
     // Logger::trace("s: " + String(uint16_t(micros_s - micros_p)) + ";\t\ts to
@@ -162,7 +167,7 @@ void Rov::loop() {
     debug->debugHandler();
     int del = 7500 - (micros() - micros_p);
 #if PROFILE_OSCILLOGRAPH
-    digitalWrite(PROFILE_PIN, 1);
+    digitalWrite(PROFILE_OSCILLOGRAPH_PIN, 1);
 #endif
     delayMicroseconds(del > 0 ? del : 1);
 }

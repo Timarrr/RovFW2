@@ -12,6 +12,7 @@
 #define SENSORS_H
 #include "config.h"
 #include "logger.h"
+#include "ms5837.h"
 #include "wiring_private.h"
 #include <Arduino.h>
 #include <MS5837.h>
@@ -90,7 +91,7 @@ class Sensors {
      * @brief MS5837 depth sensor
      *
      */
-    MS5837 m_depthSensor;
+    MS5837Atomic m_depthSensor;
 
     /**
      * @brief Depth provided by the MS5837
