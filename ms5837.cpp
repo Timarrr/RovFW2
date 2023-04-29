@@ -132,4 +132,30 @@ void MS5837Atomic::loop() {
         P = (((D1 * SENS2) / 2097152l - OFF2) / 8192l);
     }
 }
+
+uint8_t MS5837Atomic::crc4(uint16_t n_prom[]) {
+	uint16_t n_rem = 0;
+
+	n_prom[0] = ((n_prom[0]) & 0x0FFF);
+	n_prom[7] = 0;
+
+	for ( uint8_t i = 0 ; i < 16; i++ ) {
+		if ( i%2 == 1 ) {
+			n_rem ^= (uint16_t)((n_prom[i>>1]) & 0x00FF);
+		} else {
+			n_rem ^= (uint16_t)(n_prom[i>>1] >> 8);
+		}
+		for ( uint8_t n_bit = 8 ; n_bit > 0 ; n_bit-- ) {
+			if ( n_rem & 0x8000 ) {
+				n_rem = (n_rem << 1) ^ 0x3000;
+			} else {
+				n_rem = (n_rem << 1);
+			}
+		}
+	}
+	
+	n_rem = ((n_rem >> 12) & 0x000F);
+
+	return n_rem ^ 0x00;
+}
 #endif

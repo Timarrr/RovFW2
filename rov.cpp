@@ -13,7 +13,7 @@
 #define PROFILE 0
 
 #define PROFILE_OSCILLOGRAPH 0
-#define PROFILE_OSCILLOGRAPH_PIN null
+#define PROFILE_OSCILLOGRAPH_PIN -1
 
 using namespace config::launchConfig;
 
