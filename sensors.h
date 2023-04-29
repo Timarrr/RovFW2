@@ -15,7 +15,6 @@
 #include "ms5837.h"
 #include "wiring_private.h"
 #include <Arduino.h>
-#include <MS5837.h>
 #include <Wire.h>
 #include <math.h>
 
