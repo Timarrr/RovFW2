@@ -12,12 +12,16 @@
 
 #define PROFILE 0
 
-#define PROFILE_OSCILLOGRAPH 0
+#define PROFILE_OSCILLOGRAPH     0
 #define PROFILE_OSCILLOGRAPH_PIN -1
+
+#define LIGHT_PIN A2
+#define PUMP_PIN  A3
 
 using namespace config::launchConfig;
 
 extern "C" char *sbrk(int incr);
+
 int freeMemory() {
     char top;
     return &top - reinterpret_cast<char *>(sbrk(0));
@@ -35,6 +39,7 @@ Rov::Rov()
 
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(PROFILE_OSCILLOGRAPH_PIN, OUTPUT);
+    pinMode(PUMP_PIN, OUTPUT);
     analogWrite(LED_BUILTIN, 100);
 
     if (config::serial::waitForSerial) {
@@ -76,18 +81,20 @@ Rov::Rov()
     long init_ms_begin = 0;
     thrusters =
         new Thrusters(curConf & (full | fast), curConf & full, init_ms_begin);
-    cameras = new Cameras(curConf & (full | fast), curConf & full);
-    imu = new IMUSensor(curConf & (full | fast), curConf & full);
-    manipulator = new Manipulator(curConf & (full | fast), curConf & full);
-    networking = new Networking(curConf & initEthernet,
-                                curConf & (full | forceEthernet));
-    regulators = new RovRegulators();
-    sensors = new Sensors(curConf & (full | fast), curConf & full,
-                          (curConf & initDepth) && !(curConf & forceNoDepth));
-    debug = new Debug(tele, control, auxControl);
-    Logger::debug("Waiting for " + String(9000 - (millis() - init_ms_begin)) +
-                  "ms\n\r");
-    delay(9000 - (millis() - init_ms_begin));
+    cameras      = new Cameras(curConf & (full | fast), curConf & full);
+    imu          = new IMUSensor(curConf & (full | fast), curConf & full);
+    manipulator  = new Manipulator(curConf & (full | fast), curConf & full);
+    networking   = new Networking(curConf & initEthernet,
+                                  curConf & (full | forceEthernet));
+    regulators   = new RovRegulators();
+    sensors      = new Sensors(curConf & (full | fast), curConf & full,
+                               (curConf & initDepth) && !(curConf & forceNoDepth));
+    debug        = new Debug(tele, control, auxControl);
+    
+    int32_t time = 9000 - (millis() - init_ms_begin);
+    time > 10000 ? time = 9000 : time;
+    Logger::debug("Waiting for " + String(time) + "ms\n\r");
+    delay(time);
 }
 
 void Rov::serialHandler() {
@@ -123,13 +130,13 @@ void Rov::loop() {
 #if PROFILE
     long long micros_s = micros();
 #endif
-    tele->yaw = imu->getYaw();
-    tele->roll = imu->getRoll();
-    tele->pitch = imu->getPitch();
-    tele->depth = sensors->getDepth();
+    tele->yaw         = imu->getYaw();
+    tele->roll        = imu->getRoll();
+    tele->pitch       = imu->getPitch();
+    tele->depth       = sensors->getDepth();
     tele->temperature = sensors->getTemperature();
-    tele->current = sensors->getCurrent();
-    tele->voltage = sensors->getVoltage();
+    tele->current     = sensors->getCurrent();
+    tele->voltage     = sensors->getVoltage();
     tele->cameraIndex = control->camsel;
     if (config::launchConfig::currentConfig &
         config::launchConfig::initEthernet) {
@@ -153,8 +160,8 @@ void Rov::loop() {
     manipulator->setOpenClose(control->manipulatorOpenClose);
     manipulator->setRotate(control->manipulatorRotate);
 
-    digitalWrite(A2, auxControl->auxFlags.eLight); //enable light
-    digitalWrite(A3, auxControl->auxFlags.ePump); // enable pump
+    digitalWrite(LIGHT_PIN, auxControl->auxFlags.eLight); // enable light
+    digitalWrite(PUMP_PIN, auxControl->auxFlags.ePump);   // enable pump
 
     analogWrite(LED_BUILTIN, abs((int16_t(millis() % 512)) - 256));
 #if PROFILE > 0

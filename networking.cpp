@@ -93,11 +93,13 @@ void Networking::maintain() {
 
 size_t Networking::readRovControl(RovControl &ctrl, RovAuxControl &auxCtrl) {
     uint8_t buffer[32];
-    int size = 0, packets = -1;
+    int     size         = 0;
+    int     packets      = -1;
+    size_t  data_counter = 0;
+    int8_t  header       = 0;
     do {
         size = read(buffer, 32);
-        size_t data_counter = 0;
-        int8_t header = 0;
+
         helpers::read_bytes(buffer, data_counter, header);
         if (header == ctrl.header) { // yup that's a control message
             data_counter += 1;       // skip version

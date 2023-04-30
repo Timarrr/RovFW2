@@ -30,6 +30,7 @@ void Cameras::set_angle_delta(int idx, int angle_delta) {
 
     if ((millis() - m_lastUpdateTimes[idx]) > 17) {
         m_lastUpdateTimes[idx] = millis();
+
         angles[idx] = constrain(angles[idx] + angle_delta, 0, 180);
         if (idx == 0)
             m_frontServo.write(angles[idx]);

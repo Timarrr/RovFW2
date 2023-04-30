@@ -10,6 +10,7 @@
  */
 #ifndef NETWORKING_H
 #define NETWORKING_H
+#include "api/Common.h"
 #include "config.h"
 #include "helpers.h"
 #include "logger.h"
@@ -79,6 +80,7 @@ class Networking {
      * @param size Size of the data to write
      */
     void write(uint8_t *buffer, int size);
+
     /**
      * @brief MAC address of the controller
      *
@@ -87,27 +89,25 @@ class Networking {
     /**
      * @see config::net::rovIP
      */
-    IPAddress m_selfIp = config::net::rovIP;
 
+    IPAddress m_selfIp     = config::net::rovIP;
     /**
      * @see config::net::rovPort
      */
-    uint16_t m_selfPort = config::net::rovPort;
-
+    uint16_t  m_selfPort   = config::net::rovPort;
     /**
      * @see config::net::rcIP
      */
-    IPAddress m_remoteIp = config::net::rcIP;
-
+    IPAddress m_remoteIp   = config::net::rcIP;
     /**
      * @see config::net::rcPort
      */
-    uint16_t m_remotePort = config::net::rcPort;
+    uint16_t  m_remotePort = config::net::rcPort;
 
     /**
      * @see config::net::netControllerCsPin
      */
-    short m_csPin = config::net::netControllerCsPin;
+    pin_size_t m_csPin = config::net::netControllerCsPin;
 
     /**
      * @brief last maintain() call time

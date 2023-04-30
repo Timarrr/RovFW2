@@ -27,6 +27,7 @@ void IMUSensor::imuCrc16Update(uint16_t *currentCrc, const uint8_t *src,
     for (j = 0; j < lengthInBytes; ++j) {
         uint32_t i;
         uint32_t byte = src[j];
+
         crc ^= byte << 8;
         for (i = 0; i < 8; ++i) {
             uint32_t temp = crc << 1;
@@ -46,10 +47,10 @@ void IMUSensor::imuCrc16Update(uint16_t *currentCrc, const uint8_t *src,
  * @param c
  */
 void IMUSensor::imuPacketDecode(uint8_t c) {
-    static uint16_t CRCReceived = 0;      /* CRC value received from a frame */
-    static uint16_t CRCCalculated = 0;    /* CRC value caluated from a frame */
-    static uint8_t status = kStatus_Idle; /* state machine */
-    static uint8_t crc_header[4] = {0x5A, 0xA5, 0x00, 0x00};
+    static uint16_t CRCReceived   = 0; /* CRC value received from a frame */
+    static uint16_t CRCCalculated = 0; /* CRC value caluated from a frame */
+    static uint8_t  status        = kStatus_Idle; /* state machine */
+    static uint8_t  crc_header[4] = {0x5A, 0xA5, 0x00, 0x00};
     // SerialUSB.println(String(c, 2));
     switch (status) {
     case kStatus_Idle:
@@ -69,32 +70,32 @@ void IMUSensor::imuPacketDecode(uint8_t c) {
     case kStatus_LenLow:
         // SerialUSB.println("k_LenLow");
         RxPkt.payload_len = c;
-        crc_header[2] = c;
-        status = kStatus_LenHigh;
+        crc_header[2]     = c;
+        status            = kStatus_LenHigh;
         break;
     case kStatus_LenHigh:
         // SerialUSB.println("k_LenHigh");
         RxPkt.payload_len |= (c << 8);
-        crc_header[3] = c;
-        status = kStatus_CRCLow;
+        crc_header[3]     = c;
+        status            = kStatus_CRCLow;
         break;
     case kStatus_CRCLow:
         // SerialUSB.println("k_crcLow");
         CRCReceived = c;
-        status = kStatus_CRCHigh;
+        status      = kStatus_CRCHigh;
         break;
     case kStatus_CRCHigh:
         // SerialUSB.println("k_crcHigh");
-        CRCReceived |= (c << 8);
-        RxPkt.ofs = 0;
+        CRCReceived   |= (c << 8);
+        RxPkt.ofs     = 0;
         CRCCalculated = 0;
-        status = kStatus_Data;
+        status        = kStatus_Data;
         break;
     case kStatus_Data:
         // SerialUSB.println("k_Data");
         if (RxPkt.ofs >= IMU_MAX_PACKET_LEN) {
-            status = kStatus_Idle;
-            RxPkt.ofs = 0;
+            status        = kStatus_Idle;
+            RxPkt.ofs     = 0;
             CRCCalculated = 0;
             break;
         }
@@ -171,7 +172,7 @@ void IMUSensor::update() {
     }
 }
 
-void IMUSensor::end() { SerialImu.end(); }
+void  IMUSensor::end() { SerialImu.end(); }
 // axes swap: pitch is roll
 float IMUSensor::getPitch() { return Euler[1]; }
 float IMUSensor::getRoll() { return Euler[0] + 180; }

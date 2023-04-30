@@ -2,6 +2,7 @@
 #define SENSORS_CPP
 #include "sensors.h"
 #include "USB/USBAPI.h"
+#include "api/Common.h"
 #include "config.h"
 #include "logger.h"
 #include <cmath>
@@ -25,7 +26,7 @@ Sensors::Sensors(bool launch, bool test, bool ds_init) {
 void Sensors::update() {
     using namespace config::sensors;
 
-    int rawVoltage = analogRead(voltmeter_pin);
+    int rawVoltage  = analogRead(voltmeter_pin);
     int rawAmperage = analogRead(ammeter_pin);
 
     m_voltage += rawVoltage * voltage_multiplier;
@@ -35,11 +36,11 @@ void Sensors::update() {
 
     if (m_depthSensorEnabled) {
         m_depthSensor.loop();
-        if (m_depthSensor.depth() < 150.0f) {
+        if (abs(m_depthSensor.depth()) < 150.0f || micros() < 20000000) {
             m_depth = m_depthSensor.depth();
-            m_temp = m_depthSensor.temperature();
+            m_temp  = m_depthSensor.temperature();
         } else { // don't accept value if value is too big (probably
-                    // corrupted data)
+                 // corrupted data)
             Logger::warn(F("Depth sensor read error. Retrying init\n\r"));
 
             // trying to reset I2C and init sensor again.
@@ -49,7 +50,7 @@ void Sensors::update() {
             Wire.setClock(10000);
             m_depthSensor.init();
         }
-        
+
     } else {
         m_depth = MAXFLOAT;
     }

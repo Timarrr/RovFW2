@@ -58,6 +58,7 @@ namespace helpers {
 
         union {
             T u;
+
             unsigned char u8[sizeof(T)];
         } source, dest;
 

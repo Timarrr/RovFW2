@@ -6,14 +6,14 @@ class Debug {
   public:
     union debugFlags {
         int8_t flags = 0;
-        bool depthSensor : 1;
-        bool analogSensors : 1;
-        bool imu : 1;
-        bool thrusters : 1;
-        bool manipulator : 1;
-        bool cameras : 1;
-        bool regulators : 1;
-        bool unused : 1;
+        bool   depthSensor   : 1;
+        bool   analogSensors : 1;
+        bool   imu           : 1;
+        bool   thrusters     : 1;
+        bool   manipulator   : 1;
+        bool   cameras       : 1;
+        bool   regulators    : 1;
+        bool   unused        : 1;
     };
     Debug() = delete;
     Debug(RovTelemetry *tele, RovControl *ctrl, RovAuxControl *auxCtrl)
@@ -22,8 +22,8 @@ class Debug {
     void debugHandler();
 
   private:
-    RovTelemetry *tele;
-    RovControl *ctrl;
+    RovTelemetry  *tele;
+    RovControl    *ctrl;
     RovAuxControl *auxCtrl;
-    debugFlags flags;
+    debugFlags     flags;
 };

@@ -101,25 +101,22 @@ namespace config {
          * @brief Manipulator grabbing channel
          *
          */
-        constexpr PROGMEM uint8_t manip_grab_ch = 0;
-
+        constexpr PROGMEM uint8_t manip_grab_ch    = 2;
         /**
          * @brief Manipulator releasing channel
          *
          */
-        constexpr PROGMEM uint8_t manip_release_ch = 1;
-
+        constexpr PROGMEM uint8_t manip_release_ch = 3;
         /**
          * @brief Manipulator CCW rotation channel
          *
          */
-        constexpr PROGMEM uint8_t manip_left_ch = 2;
-
+        constexpr PROGMEM uint8_t manip_left_ch    = 0;
         /**
          * @brief Manipulator CW rotation channel
          *
          */
-        constexpr PROGMEM uint8_t manip_right_ch = 3;
+        constexpr PROGMEM uint8_t manip_right_ch   = 1;
     } // namespace manipulator
 
     /**
@@ -165,6 +162,7 @@ namespace config {
          *
          */
         constexpr PROGMEM pin_size_t pins[10] = {3, 9, 8, 7, 2, 6, 4, 5};
+
         /**
          * \brief Thruster directions. Thrusters' values are multiplied by these
          * in Thrusters::update
@@ -213,7 +211,7 @@ namespace config {
             forceNoDepth =      0b0000100000000000,
             // clang-format on
             initEthernet = full | fast | forceEthernet,
-            initDepth = full | fast | forceDepth
+            initDepth    = full | fast | forceDepth
         };
 
         /**

@@ -54,6 +54,7 @@ class PDRegulator {
      *
      */
     int lastErr;
+
     /**
      * @brief last run time, used for the derivative part
      *
@@ -83,7 +84,7 @@ class FPPDRegulator {
      * @return float Control signal
      */
     float eval(float data, float target);
-    void reset();
+    void  reset();
 
   private:
     float kP;
@@ -94,7 +95,7 @@ class FPPDRegulator {
 
     int offset;
 
-    int lastData;
+    int      lastData;
     uint32_t lastTime;
 };
 

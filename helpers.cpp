@@ -4,9 +4,9 @@
 #include "helpers.h"
 
 void helpers::swapEndianRovTelemetry(RovTelemetry &rt) {
-    rt.yaw = swapEndian(rt.yaw);
+    rt.yaw   = swapEndian(rt.yaw);
     rt.pitch = swapEndian(rt.pitch);
-    rt.roll = swapEndian(rt.roll);
+    rt.roll  = swapEndian(rt.roll);
 
     rt.current = swapEndian(rt.current);
     rt.voltage = swapEndian(rt.voltage);
@@ -29,8 +29,8 @@ void helpers::swapEndianRovControl(RovControl &rc) {
     }
 
     rc.manipulatorOpenClose = swapEndian(rc.manipulatorOpenClose);
-    rc.manipulatorRotate = swapEndian(rc.manipulatorRotate);
-    rc.camsel = swapEndian(rc.camsel);
+    rc.manipulatorRotate    = swapEndian(rc.manipulatorRotate);
+    rc.camsel               = swapEndian(rc.camsel);
 }
 
 #endif

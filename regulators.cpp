@@ -14,7 +14,7 @@ int PDRegulator::eval(int data, int target) {
     int u =
         kP * (err + kD * ((lastErr - err) /
                           (lastTime - millis()))); // kP(error + kD(dError/dt))
-    lastErr = err;
+    lastErr  = err;
     lastTime = millis();
     return u;
 }
@@ -28,22 +28,22 @@ float FPPDRegulator::eval(float data, float target) {
     }
 
     float err = target - (data + 360 * offset);
-    float uP = kP * err;                                         // kP(error)
-    float uD = kD * ((err - lastError) / (micros() - lastTime)); // kD(de/dt)
+    float uP  = kP * err;                                         // kP(error)
+    float uD  = kD * ((err - lastError) / (micros() - lastTime)); // kD(de/dt)
 
     // Logger::trace("Evaluated regualtor value: " + String(uP + uD) +
     //               " (uP: " + String(uP) + ", uD: " + String(uD) +
     //               ", offset: " + String(offset, 10) + ") \n\r");
     lastError = err;
-    lastTime = micros();
-    lastData = data;
+    lastTime  = micros();
+    lastData  = data;
 
     return helpers::clamp(uP + uD, -128.0f, 127.0f);
 }
 
 void FPPDRegulator::reset() {
-    lastData = 0;
-    offset = 0;
+    lastData  = 0;
+    offset    = 0;
     lastError = 0;
 }
 
