@@ -1,11 +1,11 @@
 #ifndef SENSORS_CPP
 #define SENSORS_CPP
 #include "sensors.h"
+#include "SERCOM.h"
 #include "USB/USBAPI.h"
 #include "api/Common.h"
 #include "config.h"
 #include "logger.h"
-#include "SERCOM.h"
 #include <cmath>
 #include <cstdint>
 
@@ -37,16 +37,20 @@ void Sensors::update() {
 
     if (m_depthSensorEnabled) {
         m_depthSensor.loop();
-        if ((abs(m_depthSensor.temperature()) < 70.0f && abs(m_depthSensor.depth())) < 4.0f || micros() < 20000000) {
+        if ((abs(m_depthSensor.temperature()) < 70.0f &&
+             abs(m_depthSensor.depth())) < 4.0f ||
+            micros() < 20000000) {
             m_depth = m_depthSensor.depth();
             m_temp  = m_depthSensor.temperature();
             Logger::warn("Depth value: " + String(m_depthSensor.depth()));
-            Logger::warn("Temprerature value: " + String(m_depthSensor.temperature()));
+            Logger::warn("Temprerature value: " +
+                         String(m_depthSensor.temperature()));
         } else { // don't accept value if value is too big (probably
                  // corrupted data)
             Logger::warn(F("Depth sensor read error. Retrying init\n\r"));
             Logger::warn("Depth value: " + String(m_depthSensor.depth()));
-            Logger::warn("Temprerature value: " + String(m_depthSensor.temperature()));
+            Logger::warn("Temprerature value: " +
+                         String(m_depthSensor.temperature()));
 
             // trying to reset I2C and init sensor again.
             Wire.end();

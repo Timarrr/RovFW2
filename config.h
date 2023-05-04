@@ -218,7 +218,8 @@ namespace config {
          * @brief Current selected configuration loadout
          *
          */
-        constexpr launchConfig currentConfig = launchConfig(fast);
+        constexpr launchConfig currentConfig =
+            launchConfig(fast | forceNoDepth);
     } // namespace launchConfig
 
     /**

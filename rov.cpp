@@ -82,16 +82,16 @@ Rov::Rov()
     long init_ms_begin = 0;
     thrusters =
         new Thrusters(curConf & (full | fast), curConf & full, init_ms_begin);
-    cameras      = new Cameras(curConf & (full | fast), curConf & full);
-    imu          = new IMUSensor(curConf & (full | fast), curConf & full);
-    manipulator  = new Manipulator(curConf & (full | fast), curConf & full);
-    networking   = new Networking(curConf & initEthernet,
-                                  curConf & (full | forceEthernet));
-    regulators   = new RovRegulators();
-    sensors      = new Sensors(curConf & (full | fast), curConf & full,
-                               (curConf & initDepth) && !(curConf & forceNoDepth));
-    debug        = new Debug(tele, control, auxControl);
-    
+    cameras     = new Cameras(curConf & (full | fast), curConf & full);
+    imu         = new IMUSensor(curConf & (full | fast), curConf & full);
+    manipulator = new Manipulator(curConf & (full | fast), curConf & full);
+    networking  = new Networking(curConf & initEthernet,
+                                 curConf & (full | forceEthernet));
+    regulators  = new RovRegulators();
+    sensors     = new Sensors(curConf & (full | fast), curConf & full,
+                              (curConf & initDepth) && !(curConf & forceNoDepth));
+    debug       = new Debug(tele, control, auxControl);
+
     int32_t time = 9000 - (millis() - init_ms_begin);
     time > 10000 ? time = 9000 : time;
     Logger::debug("Waiting for " + String(time) + "ms\n\r");
@@ -135,7 +135,7 @@ void Rov::loop() {
     tele->roll        = imu->getRoll();
     tele->pitch       = imu->getPitch();
     tele->depth       = sensors->getDepth();
-    tele->temp = sensors->getTemperature();
+    tele->temp        = sensors->getTemperature();
     tele->current     = sensors->getCurrent();
     tele->voltage     = sensors->getVoltage();
     tele->cameraIndex = control->camsel;
@@ -164,9 +164,8 @@ void Rov::loop() {
     digitalWrite(LIGHT_PIN, auxControl->auxFlags.eLight); // enable light
     digitalWrite(PUMP_PIN, auxControl->auxFlags.ePump);   // enable pump
 
-
-
-    Logger::debug("ePump: " + String(auxControl->auxFlags.ePump) + " eLight: " + String(auxControl->auxFlags.eLight) + "\n");
+    Logger::debug("ePump: " + String(auxControl->auxFlags.ePump) +
+                  " eLight: " + String(auxControl->auxFlags.eLight) + "\n");
 
     analogWrite(LED_BUILTIN, abs((int16_t(millis() % 512)) - 256));
 #if PROFILE > 0

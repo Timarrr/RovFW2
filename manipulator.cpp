@@ -45,8 +45,7 @@ void Manipulator::setOpenClose(int delta) {
         return;
     using namespace config::manipulator;
     int maxSpeed = 100;
-    set(manip_release_ch, manip_grab_ch,
-        constrain(delta, -maxSpeed, maxSpeed));
+    set(manip_release_ch, manip_grab_ch, constrain(delta, -maxSpeed, maxSpeed));
 }
 
 void Manipulator::setRotate(int delta) {
@@ -54,8 +53,7 @@ void Manipulator::setRotate(int delta) {
         return;
     using namespace config::manipulator;
     int maxSpeed = 100;
-    set(manip_left_ch, manip_right_ch,
-        constrain(delta, -maxSpeed, maxSpeed));
+    set(manip_left_ch, manip_right_ch, constrain(delta, -maxSpeed, maxSpeed));
 }
 
 inline void Manipulator::set(int ch1, int ch2, int power) {

@@ -17,7 +17,7 @@ void helpers::swapEndianRovTelemetry(RovTelemetry &rt) {
     rt.depth = swapEndian(rt.depth);
 
     rt.cameraIndex = swapEndian(rt.cameraIndex);
-    rt.temp = swapEndian(rt.temp);
+    rt.temp        = swapEndian(rt.temp);
 }
 
 void helpers::swapEndianRovControl(RovControl &rc) {
