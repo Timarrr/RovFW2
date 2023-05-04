@@ -40,6 +40,7 @@ Thrusters::Thrusters(bool launch, bool test, long &init_ms_begin) {
             m_controller.setThruster(i + 1, 0);
             delay(THRUSTER_TEST_WAIT_TIME);
         }
+        init_ms_begin = millis();
     } else {
         init_ms_begin = millis();
         return;

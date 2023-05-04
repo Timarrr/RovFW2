@@ -33,6 +33,10 @@ Manipulator::Manipulator(bool launch, bool test) : m_pca(new PCA9536()) {
         setOpenClose(-100);
         setRotate(-100);
         delay(1000);
+        Logger::debug(F("sOC, sR 0"));
+        setOpenClose(0);
+        setRotate(0);
+        delay(1000);
     }
 }
 
@@ -42,7 +46,7 @@ void Manipulator::setOpenClose(int delta) {
     using namespace config::manipulator;
     int maxSpeed = 100;
     set(manip_release_ch, manip_grab_ch,
-        constrain(delta * 100, -maxSpeed, maxSpeed));
+        constrain(delta, -maxSpeed, maxSpeed));
 }
 
 void Manipulator::setRotate(int delta) {
@@ -51,7 +55,7 @@ void Manipulator::setRotate(int delta) {
     using namespace config::manipulator;
     int maxSpeed = 100;
     set(manip_left_ch, manip_right_ch,
-        constrain(delta * 100, -maxSpeed, maxSpeed));
+        constrain(delta, -maxSpeed, maxSpeed));
 }
 
 inline void Manipulator::set(int ch1, int ch2, int power) {

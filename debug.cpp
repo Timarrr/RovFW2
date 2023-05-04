@@ -8,7 +8,7 @@ void Debug::debugHandler() {
     }
     if (flags.depthSensor) {
         Logger::debug("Depth sensor readings: " + String(tele->depth) +
-                      "m deep, " + String(tele->temperature) + "ºC \n\r");
+                      "m deep, " + String(tele->temp) + "ºC \n\r");
     }
     if (flags.imu) {
         Logger::debug("IMU readings: " + String(tele->yaw) + "º yaw, " +

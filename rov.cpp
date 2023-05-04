@@ -40,6 +40,7 @@ Rov::Rov()
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(PROFILE_OSCILLOGRAPH_PIN, OUTPUT);
     pinMode(PUMP_PIN, OUTPUT);
+    pinMode(LIGHT_PIN, OUTPUT);
     analogWrite(LED_BUILTIN, 100);
 
     if (config::serial::waitForSerial) {
@@ -94,7 +95,7 @@ Rov::Rov()
     int32_t time = 9000 - (millis() - init_ms_begin);
     time > 10000 ? time = 9000 : time;
     Logger::debug("Waiting for " + String(time) + "ms\n\r");
-    delay(time);
+    delay(time > 0 ? time : 1);
 }
 
 void Rov::serialHandler() {
@@ -134,7 +135,7 @@ void Rov::loop() {
     tele->roll        = imu->getRoll();
     tele->pitch       = imu->getPitch();
     tele->depth       = sensors->getDepth();
-    tele->temperature = sensors->getTemperature();
+    tele->temp = sensors->getTemperature();
     tele->current     = sensors->getCurrent();
     tele->voltage     = sensors->getVoltage();
     tele->cameraIndex = control->camsel;
@@ -162,6 +163,10 @@ void Rov::loop() {
 
     digitalWrite(LIGHT_PIN, auxControl->auxFlags.eLight); // enable light
     digitalWrite(PUMP_PIN, auxControl->auxFlags.ePump);   // enable pump
+
+
+
+    Logger::debug("ePump: " + String(auxControl->auxFlags.ePump) + " eLight: " + String(auxControl->auxFlags.eLight) + "\n");
 
     analogWrite(LED_BUILTIN, abs((int16_t(millis() % 512)) - 256));
 #if PROFILE > 0

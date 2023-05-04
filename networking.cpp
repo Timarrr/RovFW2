@@ -146,7 +146,7 @@ void Networking::writeRovTelemetry(RovTelemetry &tele) {
     helpers::write_bytes(buffer, i, rt.current);
     helpers::write_bytes(buffer, i, rt.voltage);
     helpers::write_bytes(buffer, i, rt.cameraIndex);
-    helpers::write_bytes(buffer, i, rt.temperature);
+    helpers::write_bytes(buffer, i, rt.temp);
 
     write(buffer, i);
 }
