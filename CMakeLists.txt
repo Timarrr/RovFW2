@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project("HighROV-MATE" VERSION 0.7)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_compile_options(-D__SOFTFP__ -mlittle-endian) # needed
 add_compile_options(-Ofast -pipe -mtune=cortex-m0plus -march=armv6-m) # optimisation

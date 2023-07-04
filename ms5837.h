@@ -38,6 +38,8 @@ class MS5837Atomic {
     enum stateMachine {
         requestD1,
         requestD2,
+        waitD1,
+        waitD2,
         acquireD1,
         acquireD2,
         convertDD,

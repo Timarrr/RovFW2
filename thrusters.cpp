@@ -11,16 +11,16 @@
 #define THRUSTER_TEST_WAIT_TIME 100
 #define THRUSTER_POWER_COEFF    0.3f
 
-Thrusters::Thrusters(bool launch, bool test, long &init_ms_begin) {
+Thrusters::Thrusters(bool launch, bool test, long &thrusters_init_begin_time) {
     if (!launch) {
-        Logger::info(F("Thrusters init cancelled"));
+        Logger::info(F("Thrusters init cancelled\n"));
         return;
     }
 
     if (test) {
         Logger::info(F("Waiting for thrusters init..."));
         delay(8000);
-        Logger::info(F("  Done!"));
+        Logger::info(F("  Done!\n"));
         Logger::info(F("Testing thrusters:"));
         for (int i = 0; i < 4; i++) {
             Logger::info("Set thruster pair " + String(i) + " to -100");
@@ -40,9 +40,9 @@ Thrusters::Thrusters(bool launch, bool test, long &init_ms_begin) {
             m_controller.setThruster(i + 1, 0);
             delay(THRUSTER_TEST_WAIT_TIME);
         }
-        init_ms_begin = millis();
+        thrusters_init_begin_time = millis();
     } else {
-        init_ms_begin = millis();
+        thrusters_init_begin_time = millis();
         return;
     }
 }

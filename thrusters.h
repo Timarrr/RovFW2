@@ -27,11 +27,11 @@ class Thrusters {
      *
      * @param launch Should this subsystem actually launch?
      * @param test Do we need to test the subsystem?
-     * @param init_ms_remaining How much do we need to wait for the thrusters to
-     * init? Used for "parallalisation" when the ROV inits other subsystems
+     * @param thrusters_init_begin_time How much do we need to wait for the thrusters to
+     * init? Used for "multithreading"
      * while thrusters do their thing
      */
-    Thrusters(bool launch, bool test, long &init_ms_remaining);
+    Thrusters(bool launch, bool test, long &thrusters_init_begin_time);
 
     /**
      * @brief Updates thrusters based on RovControl object

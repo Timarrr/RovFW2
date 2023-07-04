@@ -38,6 +38,8 @@ bool MS5837Atomic::init() {
     uint8_t crcCalculated = crc4(C);
 
     if (crcCalculated == crcRead) {
+        delay(30);
+        state = requestD1;
         return true; // Initialization success
     }
 
@@ -49,16 +51,32 @@ void MS5837Atomic::loop() {
     case requestD1:
         // Request D1
         Wire.beginTransmission(MS5837_ADDR);
-        Wire.write(0x4A);
+        Wire.write(MS5837_CONVERT_D1_4096);
         Wire.endTransmission();
-        state = acquireD1;
+        state = waitD1;
         time  = micros();
         break;
-    case acquireD1:
+    case requestD2:
+        // Request D2
+        Wire.beginTransmission(MS5837_ADDR);
+        Wire.write(MS5837_CONVERT_D2_4096);
+        Wire.endTransmission();
+        state = waitD2;
+        time  = micros();
+        break;
+    case waitD1:
         if (micros() - time < 30000ull) {
             break;
         }
-        // delay(30);
+        state = acquireD1;
+        break;
+    case waitD2:
+        if (micros() - time < 30000ull) {
+            break;
+        }
+        state = acquireD2;
+        break;
+    case acquireD1:
         Wire.beginTransmission(MS5837_ADDR);
         Wire.write(MS5837_ADC_READ);
         Wire.endTransmission();
@@ -71,19 +89,7 @@ void MS5837Atomic::loop() {
 
         state = requestD2;
         break;
-    case requestD2:
-        // Request D2
-        Wire.beginTransmission(MS5837_ADDR);
-        Wire.write(0x5A);
-        Wire.endTransmission();
-        state = acquireD2;
-        time  = micros();
-        break;
     case acquireD2:
-        if (micros() - time < 30000ull) {
-            break;
-        }
-        // delay(30);
         Wire.beginTransmission(MS5837_ADDR);
         Wire.write(MS5837_ADC_READ);
         Wire.endTransmission();

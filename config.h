@@ -201,15 +201,16 @@ namespace config {
          * @todo Explain how this works
          */
         enum launchConfig {
-            // clang-format off
-            full =              0b0000000000000001,
-            fast =              0b0000000000000010,
-            standalone =        0b1000000000000000,
-            forceEthernet =     0b0100000000000000,
-            forceNoEthernet =   0b0010000000000000,
-            forceDepth =        0b0001000000000000,
-            forceNoDepth =      0b0000100000000000,
+            //
+            full            = 0b0000000000000001,
+            fast            = 0b0000000000000010,
+            standalone      = 0b1000000000000000,
+            forceEthernet   = 0b0100000000000000,
+            forceNoEthernet = 0b0010000000000000,
+            forceDepth      = 0b0001000000000000,
+            forceNoDepth    = 0b0000100000000000,
             // clang-format on
+
             initEthernet = full | fast | forceEthernet,
             initDepth    = full | fast | forceDepth
         };
@@ -218,8 +219,7 @@ namespace config {
          * @brief Current selected configuration loadout
          *
          */
-        constexpr launchConfig currentConfig =
-            launchConfig(fast | forceNoDepth);
+        constexpr launchConfig currentConfig = standalone;
     } // namespace launchConfig
 
     /**

@@ -1,9 +1,6 @@
 #ifndef ROV_CPP
 #define ROV_CPP
 #include "rov.h"
-#include "USB/USBAPI.h"
-#include "api/Common.h"
-#include "api/Compat.h"
 #include "config.h"
 #include "logger.h"
 #include "rovdatatypes.h"
@@ -54,48 +51,60 @@ Rov::Rov()
         }
         delay(200);
     }
-    digitalWrite(LED_BUILTIN, 0);
     Logger::info(F("HighROV init!\n\r"));
 
     launchConfig curConf = currentConfig;
 
-    // switch (curConf) {
-    //     case fast: //launch everything, test nothing
-    //         Logger::info(F("Fast startup selected"));
-    //         break;
-    //     case full: //launch and test everything
-    //         Logger::info(F("Full startup selected"));
-    //         break;
-    //     case forceDepth: //don't launch anything except for depth sensor
-    //         Logger::info(F("Standalone startup with forced depth sensor init
-    //         selected")); break;
-    //     case forceEthernet: //don't launch anything except for ethernet
-    //         Logger::info(F("Standalone startup with forced networking init
-    //         selected")); break;
-    //     case standalone: //don't launch anything
-    //         Logger::info(F("Standalone startup selected"));
-    //         break;
-    //     default:
-    //         Logger::info(F("Unknown launch value"));
-    //         // while (true);
-    // }
-    long init_ms_begin = 0;
-    thrusters =
-        new Thrusters(curConf & (full | fast), curConf & full, init_ms_begin);
+    if (curConf & fast) { // launch everything, test nothing
+        Logger::info(F("Fast startup selected"));
+    }
+    if (curConf & full) { // launch and test everything
+        Logger::info(F("Full startup selected"));
+    }
+    if (curConf & forceDepth) { // force depth sensor init no matter what
+        Logger::info(F("Forced depth sensor init selected"));
+        if (curConf & (fast | full)) {
+            Logger::info(
+                F("Unnescessary forceDepth flag, remove it in config.h"));
+        }
+    }
+    if (curConf & forceEthernet) { // force ethernet init no matter what
+        Logger::info(F("Forced networking init selected"));
+        if (curConf & (fast | full)) {
+            Logger::info(
+                F("Unnescessary forceEthernet flag, remove it in config.h"));
+        }
+    }
+    if (curConf & standalone) { // don't launch anything
+        if (curConf & full) {
+            Logger::info(F("Standalone setup cancelled because of fast or full "
+                           "flags in config.h"));
+        }
+        Logger::info(F("Standalone startup selected"));
+    }
+
+    long timr   = 0x80000000;
+    thrusters   = new Thrusters(curConf & (full | fast), curConf & full, timr);
     cameras     = new Cameras(curConf & (full | fast), curConf & full);
     imu         = new IMUSensor(curConf & (full | fast), curConf & full);
     manipulator = new Manipulator(curConf & (full | fast), curConf & full);
-    networking  = new Networking(curConf & initEthernet,
-                                 curConf & (full | forceEthernet));
-    regulators  = new RovRegulators();
-    sensors     = new Sensors(curConf & (full | fast), curConf & full,
-                              (curConf & initDepth) && !(curConf & forceNoDepth));
-    debug       = new Debug(tele, control, auxControl);
+    networking =
+        new Networking(curConf & initEthernet && !(curConf & forceNoEthernet),
+                       curConf & (full | forceEthernet));
+    regulators = new RovRegulators();
+    sensors    = new Sensors(curConf & (full | fast), curConf & full,
+                             (curConf & initDepth) && !(curConf & forceNoDepth));
+    debug      = new Debug(tele, control, auxControl);
 
-    int32_t time = 9000 - (millis() - init_ms_begin);
-    time > 10000 ? time = 9000 : time;
-    Logger::debug("Waiting for " + String(time) + "ms\n\r");
-    delay(time > 0 ? time : 1);
+    long long wait_while = millis() + 9000 - (millis() - timr);
+
+    while (wait_while > millis()) {
+        analogWrite(LED_BUILTIN, sin(millis() * 0.03) * 127 + 127);
+        delay(3);
+    }
+    // Logger::debug("Waiting for " + String(time) + "ms\n\r");
+    // delay(time > 0 ? time : 1);
+    Logger::debug(F("Launching main loop...\n"));
 }
 
 void Rov::serialHandler() {
@@ -103,10 +112,11 @@ void Rov::serialHandler() {
         String msg = SerialUSB.readString();
         msg.trim();
         if (msg == "reset") {
-            Logger::info(F(
-                "Resetting the controller, please reconnect the debug cable or "
-                "reactivate serial monitor if you want to continue "
-                "debugging\n\r"));
+            Logger::info(
+                F("Resetting the controller, please reconnect the debug "
+                  "cable or "
+                  "reactivate serial monitor if you want to continue "
+                  "debugging\n\r"));
             SerialUSB.end();
             sensors->end();
             imu->end();
@@ -121,6 +131,7 @@ void Rov::serialHandler() {
 }
 void Rov::loop() {
     long long micros_p = micros();
+    int       i        = 0;
 #if PROFILE_OSCILLOGRAPH
     digitalWrite(PROFILE_OSCILLOGRAPH_PIN, 0);
 #endif
@@ -161,13 +172,14 @@ void Rov::loop() {
     manipulator->setOpenClose(control->manipulatorOpenClose);
     manipulator->setRotate(control->manipulatorRotate);
 
-    digitalWrite(LIGHT_PIN, auxControl->auxFlags.eLight); // enable light
-    digitalWrite(PUMP_PIN, auxControl->auxFlags.ePump);   // enable pump
+    // digitalWrite(LIGHT_PIN, auxControl->auxFlags.eLight); // enable light
+    // digitalWrite(PUMP_PIN, auxControl->auxFlags.ePump);   // enable pump
 
-    Logger::debug("ePump: " + String(auxControl->auxFlags.ePump) +
-                  " eLight: " + String(auxControl->auxFlags.eLight) + "\n");
-
-    analogWrite(LED_BUILTIN, abs((int16_t(millis() % 512)) - 256));
+    int val = abs((int16_t(millis() % 512)) - 256);
+    Logger::debug(String(val, 10));
+    pinMode(LED_BUILTIN, OUTPUT);
+    analogWrite(LED_BUILTIN, 1024);
+    Logger::debug(String(analogRead(PIN_LED)));
 #if PROFILE > 0
     // Logger::trace("s: " + String(uint16_t(micros_s - micros_p)) + ";\t\ts to
     // nt: " + String(uint16_t(micros_nt - micros_s)) + ";\t\tnt to end: " +
