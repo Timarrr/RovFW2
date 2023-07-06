@@ -119,6 +119,8 @@ class Networking {
      *
      */
     EthernetLinkStatus m_linkStatus;
+
+    bool unused;
 };
 
 #endif

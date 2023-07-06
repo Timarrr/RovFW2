@@ -65,13 +65,13 @@ void MS5837Atomic::loop() {
         time  = micros();
         break;
     case waitD1:
-        if (micros() - time < 30000ull) {
+        if (micros() - time < 20000ull) {
             break;
         }
         state = acquireD1;
         break;
     case waitD2:
-        if (micros() - time < 30000ull) {
+        if (micros() - time < 20000ull) {
             break;
         }
         state = acquireD2;

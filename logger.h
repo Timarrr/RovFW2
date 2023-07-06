@@ -15,18 +15,6 @@
 #include <Arduino.h>
 
 /**
- * @brief "Default" stdout fd
- *
- */
-#define STDOUT 1
-
-/**
- * @brief "Default" stderr fd
- *
- */
-#define STDERR 2
-
-/**
  * @brief Decorator for trace() funcctions
  *
  */
@@ -36,26 +24,27 @@
  * @brief Decorator for debug() functions
  *
  */
-#define debug_decorator "[D]: "
+#define debug_decorator "\033[37m[D]: "
 
 /**
  * @brief Decorator for info() functions
  *
  */
-#define info_decorator "[I]: "
+#define info_decorator "\033[36m[I]: "
 
 /**
  * @brief Decorator for warn() functions
  *
  */
-#define warn_decorator "[W]: "
+#define warn_decorator "\033[33m[W]: "
 
 /**
  * @brief Decorator for error() functions
  *
  */
-#define error_decorator "[E]: "
+#define error_decorator "\033[31;1m [E]: "
 
+#define clear_formatting "\033[0m"
 /**
  * @brief Namespace to avoid congestion and separate logger functions
  *

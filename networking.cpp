@@ -14,8 +14,10 @@
 EthernetUDP udp = EthernetUDP();
 
 Networking::Networking(bool launch, bool test) : m_linkStatus(Unknown) {
-    if (!launch)
+    if (!launch) {
+        unused = true;
         return;
+    }
     Logger::info(F("Ethernet init... "));
     Ethernet.init(m_csPin);
     Logger::info(F(Ethernet.begin(m_macAddress, 10000, 5000) == 1
@@ -39,6 +41,9 @@ Networking::Networking(bool launch, bool test) : m_linkStatus(Unknown) {
 bool Networking::getLinkStatus() { return Ethernet.linkStatus() == LinkON; }
 
 void Networking::maintain() {
+    if (unused)
+        return;
+
     EthernetLinkStatus lstat = Ethernet.linkStatus();
     if (lstat == LinkON && m_linkStatus != LinkON) {
         Logger::info("Link status: On");
@@ -92,6 +97,8 @@ void Networking::maintain() {
 }
 
 size_t Networking::readRovControl(RovControl &ctrl, RovAuxControl &auxCtrl) {
+    if (unused)
+        return 0;
     uint8_t buffer[32];
     int     size         = 0;
     int     packets      = -1;
@@ -131,6 +138,9 @@ size_t Networking::readRovControl(RovControl &ctrl, RovAuxControl &auxCtrl) {
 }
 
 void Networking::writeRovTelemetry(RovTelemetry &tele) {
+    if (unused)
+        return;
+
     size_t i = 0;
 
     uint8_t buffer[128] = {};
@@ -152,12 +162,18 @@ void Networking::writeRovTelemetry(RovTelemetry &tele) {
 }
 
 int Networking::read(uint8_t *buffer, int size) {
+    if (unused)
+        return 0;
+
     int packetSize = udp.parsePacket();
     udp.read(buffer, size);
     return packetSize;
 }
 
 void Networking::write(uint8_t *buffer, int size) {
+    if (unused)
+        return;
+
     udp.beginPacket(m_remoteIp, m_remotePort);
     udp.write(buffer, size);
     udp.endPacket();

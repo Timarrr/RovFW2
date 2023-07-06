@@ -19,7 +19,7 @@ Sensors::Sensors(bool launch, bool test, bool ds_init) {
         997); // kg/m^3 (997 for freshwater, 1029 for seawater)
     if (!m_depthSensor.init()) {
         Logger::warn(
-            F("Depth sensor init failed! Will retry init on next read"));
+            F("Depth sensor init failed! Will retry init on next read\n\r"));
         return;
     }
 }
@@ -31,27 +31,18 @@ void Sensors::update() {
     int rawAmperage = analogRead(ammeter_pin);
 
     m_voltage += rawVoltage * voltage_multiplier;
-    m_voltage /= 2;
+    m_voltage *= 0.5;
     m_current += (rawAmperage - amperage_deflection) * amperage_multiplier;
-    m_current /= 2;
+    m_current *= 0.5;
 
     if (m_depthSensorEnabled) {
         m_depthSensor.loop();
         if ((abs(m_depthSensor.temperature()) < 70.0f &&
-             abs(m_depthSensor.depth())) < 4.0f ||
-            micros() < 20000000) {
+             abs(m_depthSensor.depth())) < 4.0f) {
             m_depth = m_depthSensor.depth();
             m_temp  = m_depthSensor.temperature();
-            Logger::warn("Depth value: " + String(m_depthSensor.depth()));
-            Logger::warn("Temprerature value: " +
-                         String(m_depthSensor.temperature()));
         } else { // don't accept value if value is too big (probably
                  // corrupted data)
-            Logger::warn(F("Depth sensor read error. Retrying init\n\r"));
-            Logger::warn("Depth value: " + String(m_depthSensor.depth()));
-            Logger::warn("Temprerature value: " +
-                         String(m_depthSensor.temperature()));
-
             // trying to reset I2C and init sensor again.
             Wire.end();
             Wire.begin();

@@ -78,10 +78,10 @@ class Cameras {
     long long m_lastUpdateTimes[2] = {0, 0};
 
     /**
-     * @brief unused
+     * @brief if set to true returns from every function early
      *
      */
-    // bool cam_switch = false;
+    bool inactive = false;
 };
 
 #endif

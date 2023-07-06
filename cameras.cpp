@@ -8,6 +8,11 @@
 #include <cctype>
 
 Cameras::Cameras(bool launch, bool test) {
+    if (!launch) {
+        inactive = true;
+        Logger::info(F("Rotary cameras init cancelled\n\r"));
+        return;
+    }
     Logger::info(F("Rotary cameras init\n\r"));
     pinMode(config::cameras::multiplexer_pin, OUTPUT);
     m_backServo.attach(config::cameras::back);
@@ -25,6 +30,8 @@ Cameras::Cameras(bool launch, bool test) {
 }
 
 void Cameras::set_angle_delta(int idx, int angle_delta) {
+    if (inactive)
+        return;
     int servo_idx = (idx == 0) ? config::cameras::servos::front
                                : config::cameras::servos::back;
 
@@ -40,6 +47,8 @@ void Cameras::set_angle_delta(int idx, int angle_delta) {
 }
 
 void Cameras::select_cam(int index) {
+    if (inactive)
+        return;
     digitalWrite(config::cameras::multiplexer_pin, index);
 }
 

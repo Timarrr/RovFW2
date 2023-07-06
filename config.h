@@ -219,7 +219,7 @@ namespace config {
          * @brief Current selected configuration loadout
          *
          */
-        constexpr launchConfig currentConfig = standalone;
+        constexpr launchConfig currentConfig = launchConfig(standalone | forceDepth);
     } // namespace launchConfig
 
     /**

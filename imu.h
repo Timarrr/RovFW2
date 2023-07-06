@@ -83,6 +83,8 @@ class IMUSensor {
                         uint32_t lengthInBytes);
     void imuPacketDecode(uint8_t c);
     void imuUpdateEuler(IMUHelpers::Packet_t *pkt);
+
+    bool inactive;
 };
 
 #endif

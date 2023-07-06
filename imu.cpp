@@ -13,6 +13,10 @@ Uart SerialImu(&sercom1, 12, 11, SERCOM_RX_PAD_3, UART_TX_PAD_0);
 void SERCOM1_Handler() { SerialImu.IrqHandler(); }
 
 IMUSensor::IMUSensor(bool launch, bool test) {
+    if (!launch) {
+        inactive = true;
+        return;
+    }
     Logger::info("IMU init\n\r");
     SerialImu.begin(115200);
     delay(15);
@@ -22,6 +26,8 @@ IMUSensor::IMUSensor(bool launch, bool test) {
 
 void IMUSensor::imuCrc16Update(uint16_t *currentCrc, const uint8_t *src,
                                uint32_t lengthInBytes) {
+    if (inactive)
+        return;
     uint32_t crc = *currentCrc;
     uint32_t j;
     for (j = 0; j < lengthInBytes; ++j) {
@@ -47,6 +53,9 @@ void IMUSensor::imuCrc16Update(uint16_t *currentCrc, const uint8_t *src,
  * @param c
  */
 void IMUSensor::imuPacketDecode(uint8_t c) {
+    if (inactive)
+        return;
+
     static uint16_t CRCReceived   = 0; /* CRC value received from a frame */
     static uint16_t CRCCalculated = 0; /* CRC value caluated from a frame */
     static uint8_t  status        = kStatus_Idle; /* state machine */
@@ -127,6 +136,9 @@ void IMUSensor::imuPacketDecode(uint8_t c) {
 }
 
 void IMUSensor::imuUpdateEuler(Packet_t *pkt) {
+    if (inactive)
+        return;
+
     if (pkt->buf[0] == kItemID) /* user ID */
     {
         ID = pkt->buf[1];
@@ -164,6 +176,9 @@ void IMUSensor::imuUpdateEuler(Packet_t *pkt) {
 }
 
 void IMUSensor::update() {
+    if (inactive)
+        return;
+
     if (SerialImu.available()) {
         while (SerialImu.available()) {
             char ch = SerialImu.read();

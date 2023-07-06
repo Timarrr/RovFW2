@@ -31,7 +31,8 @@ Rov::Rov()
     Wire.setTimeout(1000);
     Wire.setClock(10000);
 
-    SerialUSB.begin(115200);
+    SerialUSB.begin(2000000);
+    SerialUSB.setTimeout(50);
     unsigned int t_on = millis() + config::serial::waitForSerialTime;
 
     pinMode(LED_BUILTIN, OUTPUT);
@@ -46,7 +47,6 @@ Rov::Rov()
                 break;
             } else {
                 analogWrite(LED_BUILTIN, sin(millis() * 0.03) * 127 + 127);
-                delay(1);
             }
         }
         delay(200);
@@ -56,31 +56,31 @@ Rov::Rov()
     launchConfig curConf = currentConfig;
 
     if (curConf & fast) { // launch everything, test nothing
-        Logger::info(F("Fast startup selected"));
+        Logger::info(F("Fast startup selected\n\r"));
     }
     if (curConf & full) { // launch and test everything
-        Logger::info(F("Full startup selected"));
+        Logger::info(F("Full startup selected\n\r"));
     }
     if (curConf & forceDepth) { // force depth sensor init no matter what
-        Logger::info(F("Forced depth sensor init selected"));
+        Logger::info(F("Forced depth sensor init selected\n\r"));
         if (curConf & (fast | full)) {
             Logger::info(
-                F("Unnescessary forceDepth flag, remove it in config.h"));
+                F("Unnescessary forceDepth flag, remove it in config.h\n\r"));
         }
     }
     if (curConf & forceEthernet) { // force ethernet init no matter what
-        Logger::info(F("Forced networking init selected"));
+        Logger::info(F("Forced networking init selected\n\r"));
         if (curConf & (fast | full)) {
-            Logger::info(
-                F("Unnescessary forceEthernet flag, remove it in config.h"));
+            Logger::info(F(
+                "Unnescessary forceEthernet flag, remove it in config.h\n\r"));
         }
     }
     if (curConf & standalone) { // don't launch anything
         if (curConf & full) {
             Logger::info(F("Standalone setup cancelled because of fast or full "
-                           "flags in config.h"));
+                           "flags in config.h\n\r"));
         }
-        Logger::info(F("Standalone startup selected"));
+        Logger::info(F("Standalone startup selected\n\r"));
     }
 
     long timr   = 0x80000000;
@@ -90,27 +90,52 @@ Rov::Rov()
     manipulator = new Manipulator(curConf & (full | fast), curConf & full);
     networking =
         new Networking(curConf & initEthernet && !(curConf & forceNoEthernet),
-                       curConf & (full | forceEthernet));
+                       curConf & (full | initEthernet));
     regulators = new RovRegulators();
     sensors    = new Sensors(curConf & (full | fast), curConf & full,
                              (curConf & initDepth) && !(curConf & forceNoDepth));
     debug      = new Debug(tele, control, auxControl);
 
-    long long wait_while = millis() + 9000 - (millis() - timr);
+    int32_t wait_until = 9000 + timr;
 
-    while (wait_while > millis()) {
-        analogWrite(LED_BUILTIN, sin(millis() * 0.03) * 127 + 127);
-        delay(3);
+    Logger::debug("Waiting until millis() >= " + String(wait_until, 10) +
+                  "\n\r");
+
+    while ((int32_t)wait_until > (int32_t)millis()) {
+        analogWrite(LED_BUILTIN, sin(millis() * 0.01) * 127 + 127);
     }
-    // Logger::debug("Waiting for " + String(time) + "ms\n\r");
-    // delay(time > 0 ? time : 1);
-    Logger::debug(F("Launching main loop...\n"));
+    Logger::debug(F("Launching main loop...\n\r"));
 }
-
 void Rov::serialHandler() {
     if (SerialUSB.available()) {
-        String msg = SerialUSB.readString();
+        Logger::info(F("Detected user input, suspending execution... "));
+        String msg;
+        while (!msg.endsWith("\n") && !msg.endsWith("\r")) {
+            if (SerialUSB.available()) {
+                char pending = SerialUSB.read();
+                Logger::info(String(pending), false);
+                switch (pending) {
+                case 27: // ESC
+                    Logger::info(
+                        F("\n\rDetected char 27 - ESC, dropping input and "
+                          "returning to main loop"));
+                    return;
+                    break;
+                case 127:
+                    if(msg.length()<=0) continue;
+                    msg.remove(msg.length() - 1);
+                    Logger::info("\b \b", false);
+                    continue;
+                    break;
+                default:
+                    break;
+                }
+                msg += pending;
+            }
+        }
+        Logger::info("\n\r");
         msg.trim();
+
         if (msg == "reset") {
             Logger::info(
                 F("Resetting the controller, please reconnect the debug "
@@ -122,11 +147,12 @@ void Rov::serialHandler() {
             imu->end();
             NVIC_SystemReset();
         } else if (msg == "debug")
-            asm("nop"); // TODO: implement debug menu
-        else
+            debug->menu(); // TODO: implement debug menu
+        else {
             Logger::info(
                 F("send \"reset\" for controller reset or \"debug\" for "
-                  "debug menu [NIY]"));
+                  "debug menu, continuing execution\n\r"));
+        }
     }
 }
 void Rov::loop() {
@@ -174,12 +200,7 @@ void Rov::loop() {
 
     // digitalWrite(LIGHT_PIN, auxControl->auxFlags.eLight); // enable light
     // digitalWrite(PUMP_PIN, auxControl->auxFlags.ePump);   // enable pump
-
-    int val = abs((int16_t(millis() % 512)) - 256);
-    Logger::debug(String(val, 10));
-    pinMode(LED_BUILTIN, OUTPUT);
-    analogWrite(LED_BUILTIN, 1024);
-    Logger::debug(String(analogRead(PIN_LED)));
+    analogWrite(LED_BUILTIN, abs((int16_t(millis() % 512)) - 256));
 #if PROFILE > 0
     // Logger::trace("s: " + String(uint16_t(micros_s - micros_p)) + ";\t\ts to
     // nt: " + String(uint16_t(micros_nt - micros_s)) + ";\t\tnt to end: " +

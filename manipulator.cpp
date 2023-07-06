@@ -9,8 +9,10 @@
 #include "logger.h"
 
 Manipulator::Manipulator(bool launch, bool test) : m_pca(new PCA9536()) {
-    if (!launch)
+    if (!launch) {
+        defunct = true;
         return;
+    }
 
     Logger::info(F("Manipulator init\n\r"));
     if (m_pca->begin(Wire) == false) {
