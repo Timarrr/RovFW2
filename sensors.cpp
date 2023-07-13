@@ -37,8 +37,8 @@ void Sensors::update() {
 
     if (m_depthSensorEnabled) {
         m_depthSensor.loop();
-        if ((abs(m_depthSensor.temperature()) < 70.0f &&
-             abs(m_depthSensor.depth())) < 4.0f) {
+        if ((abs(m_depthSensor.temperature()) < 7000.0f) &&
+            (abs(m_depthSensor.depth()) < 20.0f)) {
             m_depth = m_depthSensor.depth();
             m_temp  = m_depthSensor.temperature();
         } else { // don't accept value if value is too big (probably
@@ -48,7 +48,6 @@ void Sensors::update() {
             Wire.begin();
             Wire.setTimeout(1000);
             Wire.setClock(10000);
-            m_depthSensor.init();
         }
 
     } else {

@@ -1,7 +1,6 @@
 #ifndef IMU_CPP
 #define IMU_CPP
 #include "imu.h"
-#include "USB/USBAPI.h"
 #include "api/Common.h"
 #include "logger.h"
 #include "wiring_private.h"
@@ -13,10 +12,12 @@ Uart SerialImu(&sercom1, 12, 11, SERCOM_RX_PAD_3, UART_TX_PAD_0);
 void SERCOM1_Handler() { SerialImu.IrqHandler(); }
 
 IMUSensor::IMUSensor(bool launch, bool test) {
-    if (!launch) {
-        inactive = true;
-        return;
-    }
+    // if (!launch) {
+    //     inactive = true;
+    //     return;    // if (!launch) {
+    //     inactive = true;
+    //     return;
+    // }
     Logger::info("IMU init\n\r");
     SerialImu.begin(115200);
     delay(15);
@@ -26,8 +27,7 @@ IMUSensor::IMUSensor(bool launch, bool test) {
 
 void IMUSensor::imuCrc16Update(uint16_t *currentCrc, const uint8_t *src,
                                uint32_t lengthInBytes) {
-    if (inactive)
-        return;
+
     uint32_t crc = *currentCrc;
     uint32_t j;
     for (j = 0; j < lengthInBytes; ++j) {
@@ -53,8 +53,6 @@ void IMUSensor::imuCrc16Update(uint16_t *currentCrc, const uint8_t *src,
  * @param c
  */
 void IMUSensor::imuPacketDecode(uint8_t c) {
-    if (inactive)
-        return;
 
     static uint16_t CRCReceived   = 0; /* CRC value received from a frame */
     static uint16_t CRCCalculated = 0; /* CRC value caluated from a frame */
@@ -85,8 +83,8 @@ void IMUSensor::imuPacketDecode(uint8_t c) {
     case kStatus_LenHigh:
         // SerialUSB.println("k_LenHigh");
         RxPkt.payload_len |= (c << 8);
-        crc_header[3]     = c;
-        status            = kStatus_CRCLow;
+        crc_header[3]      = c;
+        status             = kStatus_CRCLow;
         break;
     case kStatus_CRCLow:
         // SerialUSB.println("k_crcLow");
@@ -96,9 +94,9 @@ void IMUSensor::imuPacketDecode(uint8_t c) {
     case kStatus_CRCHigh:
         // SerialUSB.println("k_crcHigh");
         CRCReceived   |= (c << 8);
-        RxPkt.ofs     = 0;
-        CRCCalculated = 0;
-        status        = kStatus_Data;
+        RxPkt.ofs      = 0;
+        CRCCalculated  = 0;
+        status         = kStatus_Data;
         break;
     case kStatus_Data:
         // SerialUSB.println("k_Data");
@@ -136,8 +134,6 @@ void IMUSensor::imuPacketDecode(uint8_t c) {
 }
 
 void IMUSensor::imuUpdateEuler(Packet_t *pkt) {
-    if (inactive)
-        return;
 
     if (pkt->buf[0] == kItemID) /* user ID */
     {
@@ -145,17 +141,20 @@ void IMUSensor::imuUpdateEuler(Packet_t *pkt) {
     }
     if (pkt->buf[2] == kItemAccRaw) /* Acc raw value */
     {
-        memcpy(AccRaw, (uint8_t *)pkt->buf[3], 6);
+        memcpy(AccelRaw, (uint8_t *)pkt->buf[3], 6);
+        Accel[0] = AccelRaw[0] * .001;
+        Accel[1] = AccelRaw[1] * .001;
+        Accel[2] = AccelRaw[2] * .001;
     }
 
     if (pkt->buf[9] == kItemGyoRaw) /* gyro raw value */
     {
-        memcpy(GyoRaw, (uint8_t *)pkt->buf[10], 6);
+        memcpy(GyroRaw, (uint8_t *)pkt->buf[10], 6);
     }
 
     if (pkt->buf[16] == kItemMagRaw) /* mag raw value */
     {
-        memcpy(MagRaw, (uint8_t *)pkt->buf[17], 6);
+        memcpy(MagnetRaw, (uint8_t *)pkt->buf[17], 6);
     }
     if (pkt->buf[23] == kItemAtdE) /* atd E */
     {
@@ -176,8 +175,6 @@ void IMUSensor::imuUpdateEuler(Packet_t *pkt) {
 }
 
 void IMUSensor::update() {
-    if (inactive)
-        return;
 
     if (SerialImu.available()) {
         while (SerialImu.available()) {
@@ -189,8 +186,12 @@ void IMUSensor::update() {
 
 void  IMUSensor::end() { SerialImu.end(); }
 // axes swap: pitch is roll
-float IMUSensor::getPitch() { return Euler[1]; }
-float IMUSensor::getRoll() { return Euler[0] + 180; }
-float IMUSensor::getYaw() { return Euler[2] + 180; }
+float IMUSensor::getPitch() { return Euler[0]; }
+float IMUSensor::getRoll() { return Euler[1]; }
+float IMUSensor::getYaw() { return Euler[2]; }
+
+float IMUSensor::getAccel0() { return Accel[0]; }
+float IMUSensor::getAccel1() { return Accel[1]; }
+float IMUSensor::getAccel2() { return Accel[2]; }
 
 #endif

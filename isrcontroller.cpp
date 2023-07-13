@@ -31,9 +31,12 @@ ISRController::ISRController() {
 }
 
 void ISRController::setThruster(int idx, int power) {
-    int pulse = map(power, -100, 100, 1010, 1990);
-
-    pulse = constrain(pulse, 1010, 1990);
+    int pulse;
+    if (power != 0)
+        pulse = map(power, -100, 100, 1000, 2000);
+    else
+        pulse = 1488;
+    pulse = constrain(pulse, 1000, 2000);
     SAMD_ISR_Servos.setPulseWidth(m_isrServos[idx], pulse);
 }
 

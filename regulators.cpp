@@ -53,8 +53,8 @@ RovRegulators::RovRegulators()
       rRoll(config::regulators::roll_p, config::regulators::roll_d),
       rPitch(config::regulators::pitch_p, config::regulators::pitch_d) {}
 
-RovControl RovRegulators::evaluate(RovControl ctrl, RovAuxControl &auxCtrl,
-                                   RovTelemetry &tele) {
+void RovRegulators::evaluate(RovControl ctrl, RovAuxControl &auxCtrl,
+                             RovTelemetry &tele) {
     if (auxCtrl.auxFlags.eDepth &&
         tele.depth !=
             MAXFLOAT) { // If depth reg is enabled, evaluate its control signal
@@ -109,5 +109,4 @@ RovControl RovRegulators::evaluate(RovControl ctrl, RovAuxControl &auxCtrl,
     ctrl.thrusterPower[7] = helpers::clamp(
         -int16_t(uD) + int16_t(uP) - int16_t(uR) + ctrl.thrusterPower[7], -128,
         127);
-    return RovControl(ctrl);
 }

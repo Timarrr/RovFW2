@@ -1,6 +1,7 @@
 #include "debug.h"
 #include "logger.h"
 #include <Arduino.h>
+#include <cstdio>
 inline char *padding(int val) {
     if (val > 0)
         (val >= 100) ? " " : (val >= 10) ? "  " : "   ";
@@ -11,64 +12,70 @@ void Debug::debugHandler() {
     String         out;
     unsigned short nl_count = 0;
     if (flags.analogSensors) {
-        out += "Analog sensors' readings: ";
-        out += padding(tele->current);
-        out += String(abs(tele->current), 2) + " A @ ";
-        out += padding(tele->voltage);
-        out += String(abs(tele->voltage)) + " V\n\r";
+        char buffer[96];
+        sprintf(buffer, "Analog sensors' readings: \t%07.3f A, \t%07.3f V \n\r",
+                tele->current, tele->voltage);
+        out += buffer;
         nl_count++;
     }
     if (flags.depthSensor) {
-        out += "Depth sensor readings: " + String(tele->depth) + "m deep, " +
-               String(tele->temp) + "ºC \n\r";
+        char buffer[64];
+        sprintf(buffer, "Depth sensor readings: \t%07.3f m, \t%07.3f ºC\n\r",
+                tele->depth, tele->temp);
+        out += buffer;
         nl_count++;
     }
     if (flags.imu) {
-        out += "IMU readings: " + String(tele->yaw) + "º yaw, " +
-               String(tele->roll) + "º roll, " + String(tele->pitch) +
-               "º pitch\n\r";
-        nl_count++;
+        char buffer[196];
+        int  ccount;
+        sprintf(buffer,
+                "IMU readings:\t%07.3f º Yaw,\t%07.3f º Rol,\t%07.3f º Pit\n\r "
+                "             \t%09.3f G X,\t%09.3f G Y,\t%09.3f G Z, %n%d\n\r",
+                tele->yaw, tele->roll, tele->pitch, tele->accel0, tele->accel1,
+                tele->accel2, &ccount, ccount);
+        out      += buffer;
+        nl_count += 2;
     }
     if (flags.thrusters) {
-        out += "Thrusters' power: \n\r";
-        out += "    HFR: " + String(ctrl->thrusterPower[1]) +
-               " HFL: " + String(ctrl->thrusterPower[0]) + "\n\r",
-            false;
-        out += "    HBR: " + String(ctrl->thrusterPower[3]) +
-               " HBL: " + String(ctrl->thrusterPower[2]) + "\n\r",
-            false;
-        out += "    VBR: " + String(ctrl->thrusterPower[7]) +
-               " VBL: " + String(ctrl->thrusterPower[6]) + "\n\r",
-            false;
-        out += "    VFR: " + String(ctrl->thrusterPower[5]) +
-               " VFL: " + String(ctrl->thrusterPower[4]) + "\n\r",
-            false;
-        nl_count += 5;
+        char buffer[196];
+        sprintf(buffer,
+                "Thrusters' power: \n\r"
+                "0:  %5d, 1:  %5d, 2: %5d, 3: %5d\n\r"
+                "4:  %5d, 5:  %5d, 6: %5d, 7: %5d\n\r",
+                ctrl->thrusterPower[0], ctrl->thrusterPower[1],
+                ctrl->thrusterPower[2], ctrl->thrusterPower[3],
+                ctrl->thrusterPower[4], ctrl->thrusterPower[5],
+                ctrl->thrusterPower[6], ctrl->thrusterPower[7]);
+        out      += buffer;
+        nl_count += 3;
     }
     if (flags.manipulator) {
-        out += "Manipualtor control signals: Open-close: " +
-               String(ctrl->manipulatorOpenClose) +
-               " Rotate: " + String(ctrl->manipulatorRotate) + "\n\r";
+        char buffer[64];
+        sprintf(buffer, "Manipulator control: %03d O-C, %03d Rot\n\r",
+                ctrl->manipulatorOpenClose, ctrl->manipulatorRotate);
+        out += buffer;
         nl_count++;
     }
     if (flags.cameras) {
-        out += String("Cameras' rotation: ") +
-               "Front: " + String(ctrl->cameraRotationDelta[0]) +
-               " Rear: " + String(ctrl->cameraRotationDelta[1]) +
-               " CamSel: " + String(ctrl->camsel) + "\n\r";
+        char buffer[96];
+        sprintf(buffer, "Cameras' rotation: F:%01d, R:%01d, camsel: %01d\n\r",
+                ctrl->cameraRotationDelta[0], ctrl->cameraRotationDelta[1],
+                ctrl->camsel);
+        out += buffer;
         nl_count++;
     }
     if (flags.regulators) {
         out              += "Regulators debug not implemented!\n\r";
-        flags.regulators = 0;
+        flags.regulators  = 0;
     }
 
     String prefix;
-    for (; nl_count > 0; nl_count--) {
-        prefix += "\033[F";
-        prefix += "\033[K";
+    if (nl_count > 0) {
+        for (; nl_count > 0; nl_count--) {
+            prefix += "\033[F\033[K";
+        }
+        Logger::info(prefix + out, false);
     }
-    Logger::info(prefix + out, false);
 }
 
 void Debug::menu() {
@@ -116,6 +123,11 @@ void Debug::menu() {
         }
         if (pendingInput.indexOf('7') >= 0 || pendingInput.indexOf('r') >= 0) {
             Logger::debug(F("Toggling regulators debug mode\n\r"));
+            pendingFlags.regulators = !flags.regulators;
+        }
+        if (pendingInput.indexOf('8') >= 0 || pendingInput.indexOf('C') >= 0) {
+            Logger::debug(F("I'm Ayana and I manage this ROV! ^_^\n\r"));
+            Logger::debug(ayana, false);
             pendingFlags.regulators = !flags.regulators;
         }
         if (pendingInput.indexOf('0') >= 0 || pendingInput.indexOf('e') >= 0) {

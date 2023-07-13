@@ -8,10 +8,10 @@
 #include "isrcontroller.h"
 #include "logger.h"
 #include "rovdatatypes.h"
-#define THRUSTER_TEST_WAIT_TIME 100
-#define THRUSTER_POWER_COEFF    0.3f
+#define THRUSTER_TEST_WAIT_TIME 1000
+#define THRUSTER_POWER_COEFF    0.1f
 
-Thrusters::Thrusters(bool launch, bool test, long &thrusters_init_begin_time) {
+Thrusters::Thrusters(bool launch, bool test, long &thrusters_init_begin_time) : m_controller() {
     if (!launch) {
         Logger::info(F("Thrusters init cancelled\n\r"));
         return;
@@ -19,28 +19,24 @@ Thrusters::Thrusters(bool launch, bool test, long &thrusters_init_begin_time) {
 
     if (test) {
         Logger::info(F("Waiting for thrusters init..."));
-        delay(8000);
+        delay(9000);
         Logger::info(F("  Done!\n\r"));
         Logger::info(F("Testing thrusters:\n\r"));
-        for (int i = 0; i < 4; i++) {
-            Logger::info("Set thruster pair " + String(i) + " to -100\r");
+        for (int i = 0; i < 8; i++) {
+            Logger::info("\t\t\t\t\t\rSet thruster " + String(i) + " to -100\r");
             m_controller.setThruster(i, -100 * THRUSTER_POWER_COEFF);
-            m_controller.setThruster(i + 1, -100 * THRUSTER_POWER_COEFF);
             delay(THRUSTER_TEST_WAIT_TIME);
-            Logger::info("Set thruster pair " + String(i) + " to 0\r");
+            Logger::info("\t\t\t\t\t\rSet thruster " + String(i) + " to 0\r");
             m_controller.setThruster(i, 0);
-            m_controller.setThruster(i + 1, 0);
             delay(THRUSTER_TEST_WAIT_TIME);
-            Logger::info("Set thruster pair " + String(i) + " to 100\r");
+            Logger::info("\t\t\t\t\t\rSet thruster " + String(i) + " to 100\r");
             m_controller.setThruster(i, 100 * THRUSTER_POWER_COEFF);
-            m_controller.setThruster(i + 1, 100 * THRUSTER_POWER_COEFF);
             delay(THRUSTER_TEST_WAIT_TIME);
-            Logger::info("Set thruster pair " + String(i) + " to 0\r");
+            Logger::info("\t\t\t\t\t\rSet thruster " + String(i) + " to 0\r");
             m_controller.setThruster(i, 0);
-            m_controller.setThruster(i + 1, 0);
             delay(THRUSTER_TEST_WAIT_TIME);
         }
-        thrusters_init_begin_time = millis();
+        thrusters_init_begin_time = 0;
     } else {
         thrusters_init_begin_time = millis();
         return;

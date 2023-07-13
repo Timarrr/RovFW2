@@ -101,22 +101,22 @@ namespace config {
          * @brief Manipulator grabbing channel
          *
          */
-        constexpr PROGMEM uint8_t manip_grab_ch    = 2;
+        constexpr PROGMEM uint8_t manip_grab_ch    = 0;
         /**
          * @brief Manipulator releasing channel
          *
          */
-        constexpr PROGMEM uint8_t manip_release_ch = 3;
+        constexpr PROGMEM uint8_t manip_release_ch = 1;
         /**
          * @brief Manipulator CCW rotation channel
          *
          */
-        constexpr PROGMEM uint8_t manip_left_ch    = 0;
+        constexpr PROGMEM uint8_t manip_left_ch    = 2;
         /**
          * @brief Manipulator CW rotation channel
          *
          */
-        constexpr PROGMEM uint8_t manip_right_ch   = 1;
+        constexpr PROGMEM uint8_t manip_right_ch   = 3;
     } // namespace manipulator
 
     /**
@@ -161,14 +161,14 @@ namespace config {
          * @brief Pins corresponding to the enum
          *
          */
-        constexpr PROGMEM pin_size_t pins[10] = {3, 9, 8, 7, 2, 6, 4, 5};
+        constexpr PROGMEM pin_size_t pins[10] = {2, 3, 4, 5, 6, 7, 8, 9};
 
         /**
          * \brief Thruster directions. Thrusters' values are multiplied by these
          * in Thrusters::update
          */
-        constexpr static int8_t thrusterDirections[10] = {1, -1, -1, 1, -1,
-                                                          1, -1, 1,  1, 1};
+        constexpr static int8_t thrusterDirections[10] = {1, 1, 1, 1, 1,
+                                                          1, 1, 1, 1, 1};
 
     } // namespace thrusters
 
@@ -202,13 +202,15 @@ namespace config {
          */
         enum launchConfig {
             //
-            full            = 0b0000000000000001,
-            fast            = 0b0000000000000010,
-            standalone      = 0b1000000000000000,
-            forceEthernet   = 0b0100000000000000,
-            forceNoEthernet = 0b0010000000000000,
-            forceDepth      = 0b0001000000000000,
-            forceNoDepth    = 0b0000100000000000,
+            full              = 0b0000000000000001,
+            fast              = 0b0000000000000010,
+            standalone        = 0b1000000000000000,
+            forceEthernet     = 0b0100000000000000,
+            forceNoEthernet   = 0b0010000000000000,
+            forceDepth        = 0b0001000000000000,
+            forceNoDepth      = 0b0000100000000000,
+            forceNoRegulators = 0b0000010000000000,
+            forceThrusterTest = 0b0000001000000000,
             // clang-format on
 
             initEthernet = full | fast | forceEthernet,
@@ -219,7 +221,8 @@ namespace config {
          * @brief Current selected configuration loadout
          *
          */
-        constexpr launchConfig currentConfig = launchConfig(standalone | forceDepth);
+        constexpr launchConfig currentConfig =
+            launchConfig(fast);
     } // namespace launchConfig
 
     /**
