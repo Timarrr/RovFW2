@@ -30,11 +30,12 @@ void Debug::debugHandler() {
         int  ccount;
         sprintf(buffer,
                 "IMU readings:\t%07.3f º Yaw,\t%07.3f º Rol,\t%07.3f º Pit\n\r "
+                "Calibration: \t%07.3f º Yaw,\t%07.3f º Rol,\t%07.3f º Pit\n\r "
                 "             \t%09.3f G X,\t%09.3f G Y,\t%09.3f G Z, %n%d\n\r",
-                tele->yaw, tele->roll, tele->pitch, tele->accel0, tele->accel1,
+                tele->yaw, tele->roll, tele->pitch, tele->yawCal, tele->rollCal, tele->pitchCal, tele->accel0, tele->accel1,
                 tele->accel2, &ccount, ccount);
         out      += buffer;
-        nl_count += 2;
+        nl_count += 3;
     }
     if (flags.thrusters) {
         char buffer[196];
@@ -88,8 +89,9 @@ void Debug::menu() {
                    "    4. Thrusters\n\r"
                    "    5. Manipulator\n\r"
                    "    6. Cameras\n\r"
-                   "    7. Regulators\n\r"));
-    Logger::info(F("Input: [1,d/2,a/3,i/4,t/5,m/6,c/7,r/0,e]: "));
+                   "    7. Regulators\n\r"
+                   "    9. Invalidate IMU calibration data\n\r"));
+    Logger::info(F("Input: [1,d/2,a/3,i/4,t/5,m/6,c/7,r/8,C/9,I/0,e]: "));
 
     String     input;
     debugFlags pendingFlags = flags;
@@ -129,6 +131,10 @@ void Debug::menu() {
             Logger::debug(F("I'm Ayana and I manage this ROV! ^_^\n\r"));
             Logger::debug(ayana, false);
             pendingFlags.regulators = !flags.regulators;
+        }
+        if (pendingInput.indexOf('9') >= 0 || pendingInput.indexOf('I') >= 0) {
+            Logger::debug(F("Invalidating IMU calibration data\n\r"));
+            auxCtrl->auxFlags.imuInvCal = 1;
         }
         if (pendingInput.indexOf('0') >= 0 || pendingInput.indexOf('e') >= 0) {
             pendingInput += "\n\r";

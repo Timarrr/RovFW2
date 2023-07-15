@@ -107,15 +107,8 @@ class Rov {
      */
     RovAuxControl *auxControl;
 
-    /**
-     * @brief RovRegulators object
-     * @see RovRegulators
-     */
-    RovRegulators *regulators;
-
     Debug *debug;
 
-    bool regulatorsExecuted = 0;
 };
 
 #endif

@@ -11,7 +11,7 @@ ISRController::ISRController() {
 
     SAMD_ISR_Servos.useTimer(TIMER_TCC);
 
-    m_pins[0] = thrusters::frlo__le;
+    m_pins[0] = thrusters::fr_lo_le;
     m_pins[1] = thrusters::fr_lo_ri;
     m_pins[2] = thrusters::fr_hi_le;
     m_pins[3] = thrusters::fr_hi_ri;

@@ -12,7 +12,6 @@
 #define THRUSTERS_H
 #include "api/Common.h"
 #include "isrcontroller.h"
-#include "regulators.h"
 #include "rovdatatypes.h"
 #include <Arduino.h>
 

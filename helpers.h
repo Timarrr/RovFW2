@@ -83,7 +83,7 @@ namespace helpers {
     /**
      * @brief Swaps endianness \b {in-place} in provided RovControl
      *
-     * @param rc RovControl variable
+     * @param rc RovControl variablelastTime  = micros();
      */
     void swapEndianRovControl(RovControl &rc);
 

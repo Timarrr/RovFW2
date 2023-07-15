@@ -67,11 +67,15 @@ class IMUSensor {
   public:
     IMUSensor(bool launch, bool test);
     float    getPitch();
+    float    getPitchCal();
     float    getYaw();
+    float    getYawCal();
     float    getRoll();
+    float    getRollCal();
     float    getAccel0();
     float    getAccel1();
     float    getAccel2();
+    void     invalidateCalibration() { calibrated = false; };
     int16_t *getMagnetRawPtr() { return (int16_t *)MagnetRaw; }
     int16_t *getGyroRawPtr() { return (int16_t *)GyroRaw; }
     void     update();
@@ -86,6 +90,8 @@ class IMUSensor {
     int16_t MagnetRaw[3] = {0, 0, 0};
     float   Accel[3]     = {0.0, 0.0, 0.0};
     float   Euler[3]     = {0.0, 0.0, 0.0};
+    float   EulerCal[3]  = {0.0, 0.0, 0.0};
+    bool    calibrated   = false;
 
     void imuCrc16Update(uint16_t *currentCrc, const uint8_t *src,
                         uint32_t lengthInBytes);

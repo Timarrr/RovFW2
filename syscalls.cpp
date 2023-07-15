@@ -37,7 +37,7 @@ int _write(int fd, const char *buf, int len) {
         SerialUSB.println(String(len) + "   " +
                           String(SerialUSB.availableForWrite()));
         SerialUSB.flush();
-        SerialUSB.write(buf);
+        SerialUSB.write(buf, len);
         SerialUSB.flush();
         // return 0;
     } else

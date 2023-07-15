@@ -146,22 +146,22 @@ namespace config {
          * @brief Enum of thrusters
          */
         enum thrusters {
-            fr_lo_le = 9,
-            fr_lo_ri = 3,
-            fr_hi_le = 4,
-            fr_hi_ri = 2,
-            ba_lo_le = 7,
-            ba_lo_ri = 5,
-            ba_hi_le = 8,
-            ba_hi_ri = 6,
+                fr_lo_le = 9,
+                fr_lo_ri = 3,
+                fr_hi_le = 5,
+                fr_hi_ri = 2,
+                ba_lo_le = 7,
+                ba_lo_ri = 4,
+                ba_hi_le = 8,
+                ba_hi_ri = 6,
         };
 
         /**
          * \brief Thruster directions. Thrusters' values are multiplied by these
          * in Thrusters::update
          */
-        constexpr static int8_t thrusterDirections[10] = {1, 1, 1, 1, 1,
-                                                          1, 1, 1, 1, 1};
+        constexpr static int8_t thrusterDirections[8] = {1, -1, -1, 1,
+                                                         -1, 1, -1, 1};
 
     } // namespace thrusters
 

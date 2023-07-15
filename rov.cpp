@@ -99,7 +99,6 @@ Rov::Rov()
     networking =
         new Networking(curConf & initEthernet && !(curConf & forceNoEthernet),
                        curConf & (full | initEthernet));
-    regulators = new RovRegulators();
     sensors    = new Sensors(curConf & (full | fast), curConf & full,
                              (curConf & initDepth) && !(curConf & forceNoDepth));
     debug      = new Debug(tele, control, auxControl);
@@ -196,6 +195,9 @@ void Rov::loop() {
     tele->yaw         = imu->getYaw();
     tele->roll        = imu->getRoll();
     tele->pitch       = imu->getPitch();
+    tele->yawCal      = imu->getYawCal();
+    tele->rollCal     = imu->getRollCal();
+    tele->pitchCal    = imu->getPitchCal();
     tele->accel0      = imu->getAccel0();
     tele->accel1      = imu->getAccel1();
     tele->accel2      = imu->getAccel2();
@@ -211,16 +213,10 @@ void Rov::loop() {
         if (networking->getLinkStatus()) {
             networking->readRovControl(*control, *auxControl);
             networking->writeRovTelemetry(*tele);
-            regulatorsExecuted = 0;
         }
     }
-    if (!regulatorsExecuted) {
-        regulators->evaluate(*control, *auxControl, *tele);
-        thrusters->update(*control);
-        regulatorsExecuted = 1;
-    } else {
-        thrusters->update(*control);
-    }
+    thrusters->update(*control);
+
 #if PROFILE > 0
     long long micros_nt = micros();
 #endif
@@ -231,6 +227,11 @@ void Rov::loop() {
     cameras->select_cam(control->camsel == 1);
     manipulator->setOpenClose(control->manipulatorOpenClose);
     manipulator->setRotate(control->manipulatorRotate);
+
+    if (auxControl->auxFlags.imuInvCal) {
+        imu->invalidateCalibration();
+        auxControl->auxFlags.imuInvCal = 0;
+    }
 
     // digitalWrite(LIGHT_PIN, auxControl->auxFlags.eLight); // enable light
     // digitalWrite(PUMP_PIN, auxControl->auxFlags.ePump);   // enable pump

@@ -162,15 +162,31 @@ void IMUSensor::imuUpdateEuler(Packet_t *pkt) {
             ((float)(int16_t)(pkt->buf[24] + (pkt->buf[25] << 8))) / 100;
         if (!isnan(val)) {
             Euler[0] = val;
+            if (!calibrated) {
+                EulerCal[0] = -val;
+                Logger::debug("calibrating value 0 to " + String(-val));
+            }
         }
         val = ((float)(int16_t)(pkt->buf[26] + (pkt->buf[27] << 8))) / 100;
         if (!isnan(val)) {
             Euler[1] = val;
+
+            if (!calibrated) {
+                EulerCal[1] = -val;
+                Logger::debug("calibrating value 1 to " + String(-val));
+            }
         }
         val = ((float)(int16_t)(pkt->buf[28] + (pkt->buf[29] << 8))) / 10;
         if (!isnan(val)) {
             Euler[2] = val;
+
+            if (!calibrated) {
+                EulerCal[2] = -val;
+                Logger::debug("calibrating value 2 to " + String(-val));
+            }
         }
+        if (!calibrated)
+            calibrated = true;
     }
 }
 
@@ -186,9 +202,12 @@ void IMUSensor::update() {
 
 void  IMUSensor::end() { SerialImu.end(); }
 // axes swap: pitch is roll
-float IMUSensor::getPitch() { return Euler[0]; }
-float IMUSensor::getRoll() { return Euler[1]; }
-float IMUSensor::getYaw() { return Euler[2]; }
+float IMUSensor::getPitch() { return Euler[0] + EulerCal[0]; }
+float IMUSensor::getRoll() { return Euler[1] + EulerCal[1]; }
+float IMUSensor::getYaw() { return Euler[2] + EulerCal[2]; }
+float IMUSensor::getPitchCal() { return EulerCal[0]; }
+float IMUSensor::getRollCal() { return EulerCal[1]; }
+float IMUSensor::getYawCal() { return EulerCal[2]; }
 
 float IMUSensor::getAccel0() { return Accel[0]; }
 float IMUSensor::getAccel1() { return Accel[1]; }

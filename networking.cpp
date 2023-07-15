@@ -48,7 +48,7 @@ void Networking::maintain() {
 
     EthernetLinkStatus lstat = Ethernet.linkStatus();
     if (lstat == LinkON && m_linkStatus != LinkON) {
-        Logger::info("Link status: On");
+        Logger::info("Link status: On\n\r");
         m_linkStatus = LinkON;
     } else if (lstat == LinkOFF && m_linkStatus != LinkOFF) {
         Logger::info(F("Link status: Off. This usually indicates problems with "
