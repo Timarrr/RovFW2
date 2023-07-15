@@ -158,48 +158,53 @@ struct RovTelemetry {
      * \brief Version of the protocol used by the RovUI and ROV to communicate
      * \todo Implement handshake protocol
      */
-    uint8_t version     = 2;
+    uint8_t version = 2;
     /**
      * \brief Depth data from the ROV
      */
-    float   depth       = 0.0f;
+    float   depth   = 0.0f;
     /**
      * \brief Pitch angle data from the ROV
      * Valid values are from 0 to 360, in degrees
      * \image html rov_pitch_img.png
      */
-    float   pitch       = 0;
+    float   pitch   = 0;
     /**
      * \brief Yaw angle data from the ROV
      * Valid values are from 0 to 360, in degrees
      * \image html rov_yaw_img.png
      */
-    float   yaw         = 0;
+    float   yaw     = 0;
     /**
      * \brief Roll angle data from the ROV
      * Valid values are from 0 to 360, in degrees
      * \image html rov_roll_img.png
      */
-    float   roll        = 0;
+    float   roll    = 0;
+
+    float accel0 = 0;
+    float accel1 = 0;
+    float accel2 = 0;
+
     /**
      * \brief Current consumption data from the ROV, in A
      * \b {SHOULD BE LESS THAN 25A}
      */
-    float   current     = 0.0f;
+    float  current     = 0.0f;
     /**
      * \brief Voltage coming to the ROV, in V
      * \b {SHOULD BE NO LESS THAN 6V AND NO MORE THAN 12V}
      */
-    float   voltage     = 0.0f;
+    float  voltage     = 0.0f;
     /**
      * \see RovControl.camsel
      */
-    int8_t  cameraIndex = 0;
+    int8_t cameraIndex = 0;
     /**
      * \brief Temperature data from the ROV
      * Temperature sensor is located outside the electronics enclosure
      */
-    float   temp        = 0.0f;
+    float  temp        = 0.0f;
     RovTelemetry() {}
 };
 #endif // ROVDATATYPES_H

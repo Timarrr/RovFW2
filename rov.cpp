@@ -26,7 +26,7 @@ int freeMemory() {
 
 Rov::Rov()
     : tele(new RovTelemetry), control(new RovControl),
-      rawControl(new RovControl), auxControl(new RovAuxControl) {
+      auxControl(new RovAuxControl) {
     Wire.begin();
     Wire.setTimeout(1000);
     Wire.setClock(10000);
@@ -68,6 +68,13 @@ Rov::Rov()
                 F("Unnescessary forceDepth flag, remove it in config.h\n\r"));
         }
     }
+    if (curConf & forceThrusterTest) {
+        Logger::info(F("Forced thruster testing selected"));
+        if (curConf & full) {
+            Logger::info(
+                F("Unnescessary forceThrusterTest flag, remove it in config"));
+        }
+    }
     if (curConf & forceEthernet) { // force ethernet init no matter what
         Logger::info(F("Forced networking init selected\n\r"));
         if (curConf & (fast | full)) {
@@ -76,7 +83,7 @@ Rov::Rov()
         }
     }
     if (curConf & standalone) { // don't launch anything
-        if (curConf & full) {
+        if (curConf & (fast | full)) {
             Logger::info(F("Standalone setup cancelled because of fast or full "
                            "flags in config.h\n\r"));
         }
@@ -84,7 +91,8 @@ Rov::Rov()
     }
 
     long timr   = 0x80000000;
-    thrusters   = new Thrusters(curConf & (full | fast), curConf & full, timr);
+    thrusters   = new Thrusters(curConf & (full | fast | forceThrusterTest),
+                                curConf & (full | forceThrusterTest), timr);
     cameras     = new Cameras(curConf & (full | fast), curConf & full);
     imu         = new IMUSensor(curConf & (full | fast), curConf & full);
     manipulator = new Manipulator(curConf & (full | fast), curConf & full);
@@ -100,10 +108,26 @@ Rov::Rov()
 
     Logger::debug("Waiting until millis() >= " + String(wait_until, 10) +
                   "\n\r");
-
+    bool inc       = true;
+    int  update_on = millis();
+    analogWrite(PIN_LED, 0);
     while ((int32_t)wait_until > (int32_t)millis()) {
-        analogWrite(LED_BUILTIN, sin(millis() * 0.01) * 127 + 127);
+        if (millis() >= update_on) {
+            if (inc) {
+                digitalWrite(PIN_LED_RXL, 0);
+                digitalWrite(PIN_LED_TXL, 1);
+                inc = false;
+            } else {
+                digitalWrite(PIN_LED_RXL, 1);
+                digitalWrite(PIN_LED_TXL, 0);
+                inc = true;
+            }
+            update_on = millis() + 60;
+        }
     }
+    digitalWrite(PIN_LED_RXL, 0);
+    digitalWrite(PIN_LED_TXL, 0);
+
     Logger::debug(F("Launching main loop...\n\r"));
 }
 void Rov::serialHandler() {
@@ -122,7 +146,8 @@ void Rov::serialHandler() {
                     return;
                     break;
                 case 127:
-                    if(msg.length()<=0) continue;
+                    if (msg.length() <= 0)
+                        continue;
                     msg.remove(msg.length() - 1);
                     Logger::info("\b \b", false);
                     continue;
@@ -171,22 +196,31 @@ void Rov::loop() {
     tele->yaw         = imu->getYaw();
     tele->roll        = imu->getRoll();
     tele->pitch       = imu->getPitch();
+    tele->accel0      = imu->getAccel0();
+    tele->accel1      = imu->getAccel1();
+    tele->accel2      = imu->getAccel2();
     tele->depth       = sensors->getDepth();
     tele->temp        = sensors->getTemperature();
     tele->current     = sensors->getCurrent();
     tele->voltage     = sensors->getVoltage();
     tele->cameraIndex = control->camsel;
+
     if (config::launchConfig::currentConfig &
         config::launchConfig::initEthernet) {
         networking->maintain();
         if (networking->getLinkStatus()) {
-            networking->readRovControl(*rawControl, *auxControl);
+            networking->readRovControl(*control, *auxControl);
             networking->writeRovTelemetry(*tele);
+            regulatorsExecuted = 0;
         }
     }
-    memcpy(control, rawControl, sizeof(RovControl));
-    *control = regulators->evaluate(*control, *auxControl, *tele);
-    thrusters->update(*control);
+    if (!regulatorsExecuted) {
+        regulators->evaluate(*control, *auxControl, *tele);
+        thrusters->update(*control);
+        regulatorsExecuted = 1;
+    } else {
+        thrusters->update(*control);
+    }
 #if PROFILE > 0
     long long micros_nt = micros();
 #endif

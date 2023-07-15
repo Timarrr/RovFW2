@@ -50,7 +50,7 @@ class ISRController {
      * @todo research and clarify this
      *
      */
-    static const int pulse_med = 1500;
+    static const int pulse_med = 1488;
 
     /**
      * @brief Maximum (full forward) thrust in microsesonds(?)

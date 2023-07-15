@@ -13,6 +13,8 @@
 #define IMU_H
 #include "Uart.h"
 #include <Arduino.h>
+#include <cstddef>
+#include <cstdint>
 #define IMU_MAX_PACKET_LEN 256
 
 namespace IMUHelpers {
@@ -64,27 +66,33 @@ namespace IMUHelpers {
 class IMUSensor {
   public:
     IMUSensor(bool launch, bool test);
-    float getPitch();
-    float getYaw();
-    float getRoll();
-    void  update();
-    void  end();
+    float    getPitch();
+    float    getYaw();
+    float    getRoll();
+    float    getAccel0();
+    float    getAccel1();
+    float    getAccel2();
+    int16_t *getMagnetRawPtr() { return (int16_t *)MagnetRaw; }
+    int16_t *getGyroRawPtr() { return (int16_t *)GyroRaw; }
+    void     update();
+    void     end();
 
   private:
     IMUHelpers::Packet_t RxPkt;
 
     uint8_t ID;
-    int16_t AccRaw[3] = {0, 0, 0};
-    int16_t GyoRaw[3] = {0, 0, 0};
-    int16_t MagRaw[3] = {0, 0, 0};
-    float   Euler[3]  = {0.0, 0.0, 0.0};
+    int16_t AccelRaw[3]  = {0, 0, 0};
+    int16_t GyroRaw[3]   = {0, 0, 0};
+    int16_t MagnetRaw[3] = {0, 0, 0};
+    float   Accel[3]     = {0.0, 0.0, 0.0};
+    float   Euler[3]     = {0.0, 0.0, 0.0};
 
     void imuCrc16Update(uint16_t *currentCrc, const uint8_t *src,
                         uint32_t lengthInBytes);
     void imuPacketDecode(uint8_t c);
     void imuUpdateEuler(IMUHelpers::Packet_t *pkt);
 
-    bool inactive;
+    bool inactive = false;
 };
 
 #endif

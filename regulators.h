@@ -117,8 +117,7 @@ class RovRegulators {
      * @param auxCtrl
      * @param tele
      */
-    RovControl evaluate(RovControl ctrl, RovAuxControl &auxCtrl,
-                        RovTelemetry &tele);
+    void evaluate(RovControl ctrl, RovAuxControl &auxCtrl, RovTelemetry &tele);
 
   private:
     /**

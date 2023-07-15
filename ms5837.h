@@ -14,9 +14,11 @@ class MS5837Atomic {
 
     void loop();
 
-    float depth() { return (P * 10 - 101300) / (fluidDensity * 9.80665); };
+    float depth() {
+        return ready ? (P * 10 - 101300) / (fluidDensity * 9.80665) : 0;
+    };
 
-    int32_t temperature() { return TEMP; };
+    int32_t temperature() { return ready ? TEMP : 0; };
 
   private:
     int32_t  dT    = 0;
@@ -32,6 +34,8 @@ class MS5837Atomic {
     uint32_t D2    = 0;
     int32_t  TEMP  = 0;
     int32_t  P     = 0;
+
+    bool ready;
 
     float fluidDensity;
 

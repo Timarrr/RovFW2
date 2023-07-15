@@ -15,13 +15,19 @@
 #define MS5837_CONVERT_D2_4096 0x58
 
 bool MS5837Atomic::init() {
+    int32_t TEMP = 0;
+    int32_t P    = 0;
+    ready        = false;
+
+    delay(10);
+
     // Reset the MS5837, per datasheet
     Wire.beginTransmission(MS5837_ADDR);
     Wire.write(MS5837_RESET);
     Wire.endTransmission();
 
     // Wait for reset to complete
-    delay(10);
+    delay(30);
 
     // Read calibration values and CRC
     for (uint8_t i = 0; i < 7; i++) {
@@ -131,6 +137,7 @@ void MS5837Atomic::loop() {
         TEMP  = (TEMP - Ti);
         P     = (((D1 * SENS2) / 2097152l - OFF2) / 8192l);
         state = requestD1;
+        ready = true;
     }
 }
 

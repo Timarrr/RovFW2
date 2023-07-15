@@ -17,6 +17,8 @@ Networking::Networking(bool launch, bool test) : m_linkStatus(Unknown) {
     if (!launch) {
         unused = true;
         return;
+    } else {
+        unused = false;
     }
     Logger::info(F("Ethernet init... "));
     Ethernet.init(m_csPin);
@@ -99,6 +101,7 @@ void Networking::maintain() {
 size_t Networking::readRovControl(RovControl &ctrl, RovAuxControl &auxCtrl) {
     if (unused)
         return 0;
+
     uint8_t buffer[32];
     int     size         = 0;
     int     packets      = -1;
@@ -109,6 +112,7 @@ size_t Networking::readRovControl(RovControl &ctrl, RovAuxControl &auxCtrl) {
 
         helpers::read_bytes(buffer, data_counter, header);
         if (header == ctrl.header) { // yup that's a control message
+            
             data_counter += 1;       // skip version
             helpers::read_bytes(buffer, data_counter, ctrl.thrusterPower);
             helpers::read_bytes(buffer, data_counter,
