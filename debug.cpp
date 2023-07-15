@@ -70,7 +70,7 @@ void Debug::debugHandler() {
     }
 
     String prefix;
-    if (nl_count>0) {
+    if (nl_count > 0) {
         for (; nl_count > 0; nl_count--) {
             prefix += "\033[F\033[K";
         }
@@ -123,6 +123,11 @@ void Debug::menu() {
         }
         if (pendingInput.indexOf('7') >= 0 || pendingInput.indexOf('r') >= 0) {
             Logger::debug(F("Toggling regulators debug mode\n\r"));
+            pendingFlags.regulators = !flags.regulators;
+        }
+        if (pendingInput.indexOf('8') >= 0 || pendingInput.indexOf('C') >= 0) {
+            Logger::debug(F("I'm Ayana and I manage this ROV! ^_^\n\r"));
+            Logger::debug(ayana, false);
             pendingFlags.regulators = !flags.regulators;
         }
         if (pendingInput.indexOf('0') >= 0 || pendingInput.indexOf('e') >= 0) {

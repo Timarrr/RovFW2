@@ -160,8 +160,8 @@ namespace config {
          * \brief Thruster directions. Thrusters' values are multiplied by these
          * in Thrusters::update
          */
-        constexpr static int8_t thrusterDirections[10] = {1, -1, -1, 1, -1,
-                                                          1, -1, 1,  1, 1};
+        constexpr static int8_t thrusterDirections[10] = {1, 1, 1, 1, 1,
+                                                          1, 1, 1, 1, 1};
 
     } // namespace thrusters
 

@@ -24,8 +24,7 @@ Thrusters::Thrusters(bool launch, bool test, long &thrusters_init_begin_time)
         Logger::info(F("  Done!\n\r"));
         Logger::info(F("Testing thrusters:\n\r"));
         for (int i = 0; i < 8; i++) {
-            Logger::info("\t\t\t\t\t\rSet thruster " + String(i) +
-                         " to -100\r");
+            Logger::info("\t\t\t\t\t\rSet thruster " + String(i) + " to -100\r");
             m_controller.setThruster(i, -100 * THRUSTER_POWER_COEFF);
             delay(THRUSTER_TEST_WAIT_TIME);
             Logger::info("\t\t\t\t\t\rSet thruster " + String(i) + " to 0\r");
