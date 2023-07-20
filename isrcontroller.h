@@ -50,7 +50,7 @@ class ISRController {
      * @todo research and clarify this
      *
      */
-    static constexpr int pulse_med[8] = {1488,1488,1488,1488,1488,1488,1488,1488};
+    static constexpr int pulse_med[8] = {1500,1500,1500,1500,1500,1500,1500,1500};
 
     /**
      * @brief Maximum (full forward) thrust in microsesonds(?)
