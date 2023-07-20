@@ -22,11 +22,11 @@ ISRController::ISRController() {
 
     for (int i = 0; i < 8; i++) {
         m_isrServos[i] =
-            SAMD_ISR_Servos.setupServo(m_pins[i], pulse_min, pulse_max);
+            SAMD_ISR_Servos.setupServo(m_pins[i], pulse_min[i], pulse_max[i]);
     }
     SAMD_ISR_Servos.setReadyToRun();
     for (int i = 0; i < 8; i++) {
-        SAMD_ISR_Servos.setPulseWidth(m_isrServos[i], pulse_med);
+        SAMD_ISR_Servos.setPulseWidth(m_isrServos[i], pulse_med[i]);
     }
 }
 
