@@ -31,11 +31,13 @@ ISRController::ISRController() {
 }
 
 void ISRController::setThruster(int idx, int power) {
-    int pulse;
-    if (power != 0)
-        pulse = map(power, -100, 100, 1000, 2000);
-    else
-        pulse = 1488;
+    int pulse = pulse_med[idx];
+    if (power < 0) {
+        pulse = map(power, -100, 0, pulse_min[idx], pulse_med[idx]);
+    }
+    if (power > 0) {
+        pulse = map(power, 0, 100, pulse_med[idx], pulse_max[idx]);
+    }
     pulse = constrain(pulse, 1000, 2000);
     SAMD_ISR_Servos.setPulseWidth(m_isrServos[idx], pulse);
 }

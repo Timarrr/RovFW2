@@ -43,21 +43,22 @@ class ISRController {
      * @todo research and clarify this
      *
      */
-    static const int pulse_min = 1000;
+    static constexpr int pulse_min[8] = {1000,1000,1000,1000,1000,1000,1000,1000};
 
     /**
      * @brief Medium (stop/neutral) thrust in microsesonds(?)
      * @todo research and clarify this
      *
      */
-    static const int pulse_med = 1488;
+    static constexpr int pulse_med[8] = {1488,1488,1488,1488,1488,1488,1488,1488};
 
     /**
      * @brief Maximum (full forward) thrust in microsesonds(?)
+
      * @todo research and clarify this
      *
      */
-    static const int pulse_max = 2000;
+    static constexpr int pulse_max[8] = {2000,2000,2000,2000,2000,2000,2000,2000};
 
     /**
      * @brief ISR pins
